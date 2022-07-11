@@ -201,7 +201,6 @@ void OpCode::execute(uint8_t opCode){
             break;
         }
         case 0x28: // jr z, n
-            // JR cc, n
             if (this->_cpu->_registers.FZ_Zero){
                 this->_cpu->_special_registers.pc += (int8_t)(Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc));
             } else {
@@ -505,7 +504,6 @@ void OpCode::execute(uint8_t opCode){
             break;
         }
         case 0xB6: // or (hl)
-            // OR (HL)
             this->_cpu->_registers.a |= Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
             this->setFlagsByLogical(false);
             break;
@@ -524,20 +522,17 @@ void OpCode::execute(uint8_t opCode){
             break;
         }
         case 0xC0: // ret nz
-            // RET !FZ
             if (!this->_cpu->_registers.FZ_Zero) {
                 this->_cpu->_special_registers.pc = (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp + 1) << 8) + Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp);
                 this->_cpu->_special_registers.sp += 2;
             }
             break;
         case 0xC1: // pop bc
-            // POP BC
             this->_cpu->_registers.c = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp);
             this->_cpu->_registers.b = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp + 1);
             this->_cpu->_special_registers.sp += 2;
             break;
         case 0xC2: // jp nz, nn
-            // JP !FZ, nn
             if (!this->_cpu->_registers.FZ_Zero) {
                 this->_cpu->_special_registers.pc = (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8) + Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
             } else {
@@ -545,11 +540,9 @@ void OpCode::execute(uint8_t opCode){
             }
             break;
         case 0xC3: // jp nn
-            // JP nn
             this->_cpu->_special_registers.pc = (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8) + Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
             break;
         case 0xC4: // call nz, nn
-            // CALL !FZ, nn
             if (!this->_cpu->_registers.FZ_Zero) {
                 uint16_t jump_addr = (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8) + Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
                 this->_cpu->_special_registers.pc += 2;
@@ -644,20 +637,17 @@ void OpCode::execute(uint8_t opCode){
             break;
         }
         case 0xD0: // ret nc
-            // RET !FC
             if (!this->_cpu->_registers.FC_Carry) {
                 this->_cpu->_special_registers.pc = (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp + 1) << 8) + Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp);
                 this->_cpu->_special_registers.sp += 2;
             }
             break;
         case 0xD1: // pop de
-            // POP DE
             this->_cpu->_registers.e = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp);
             this->_cpu->_registers.d = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp + 1);
             this->_cpu->_special_registers.sp += 2;
             break;
         case 0xD2: // jp nc, nn
-            // JP !FC, nn
             if (!this->_cpu->_registers.FC_Carry) {
                 this->_cpu->_special_registers.pc = (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8) + Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
             } else {
@@ -671,7 +661,6 @@ void OpCode::execute(uint8_t opCode){
             break;
         }
         case 0xD4: // call nc, nn
-            // CALL !FC, nn
             if (!this->_cpu->_registers.FC_Carry) {
                 uint16_t jump_addr = (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8) + Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
                 this->_cpu->_special_registers.pc += 2;
@@ -685,7 +674,6 @@ void OpCode::execute(uint8_t opCode){
             }
             break;
         case 0xD5: // push de
-            // PUSH DE
             this->_cpu->_special_registers.sp--;
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_registers.d);
             this->_cpu->_special_registers.sp--;
@@ -699,7 +687,6 @@ void OpCode::execute(uint8_t opCode){
             break;
         }
         case 0xD8: // ret c
-            // RET FC
             if (this->_cpu->_registers.FC_Carry) {
                 this->_cpu->_special_registers.pc = (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp + 1) << 8) + Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp);
                 this->_cpu->_special_registers.sp += 2;
@@ -719,7 +706,6 @@ void OpCode::execute(uint8_t opCode){
             break;
         }
         case 0xDA: // jp c, nn
-            // JP FC, nn
             if (this->_cpu->_registers.FC_Carry) {
                 this->_cpu->_special_registers.pc = (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8) + Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
             } else {
@@ -733,7 +719,6 @@ void OpCode::execute(uint8_t opCode){
             break;
         }
         case 0xDC: // call c, nn
-            // CALL FC, nn
             if (this->_cpu->_registers.FC_Carry) {
                 uint16_t jump_addr = (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8) + Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
                 this->_cpu->_special_registers.pc += 2;
@@ -794,14 +779,12 @@ void OpCode::execute(uint8_t opCode){
             }
             break;
         case 0xE5: // push hl
-            // PUSH HL
             this->_cpu->_special_registers.sp--;
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_registers.hl() >> 8);
             this->_cpu->_special_registers.sp--;
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_registers.hl() & 0xff);
             break;
         case 0xE6: // and n
-            // AND n
             this->_cpu->_registers.a &= Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
             this->_cpu->_special_registers.pc++;
             this->setFlagsByLogical(true);
@@ -813,7 +796,6 @@ void OpCode::execute(uint8_t opCode){
             }
             break;
         case 0xE9: // jp (hl)
-            // JP, (HL)
             this->_cpu->_special_registers.pc = this->_cpu->_registers.hl();
             break;
         case 0xEA: // jp pe, nn
@@ -847,7 +829,6 @@ void OpCode::execute(uint8_t opCode){
             break;
         }
         case 0xEE: // xor n
-            // XOR n
             this->_cpu->_registers.a ^= Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
             this->_cpu->_special_registers.pc++;
             this->setFlagsByLogical(false);
@@ -858,7 +839,6 @@ void OpCode::execute(uint8_t opCode){
                 this->_cpu->_special_registers.sp += 2;
             }
         case 0xF1: { // pop af
-            // POP AF
             uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp);
             this->_cpu->_registers.FZ_Zero = ((value & 0x80) == 0x80);
             this->_cpu->_registers.FN_Subtract = ((value & 0x40) == 0x40);
@@ -875,7 +855,6 @@ void OpCode::execute(uint8_t opCode){
                 this->_cpu->_special_registers.pc += 2;
             }
         case 0xF3: // di
-            // DI
             this->_cpu->waitingDI = 1;
             break;
         case 0xF4: // call p, nn
@@ -892,14 +871,12 @@ void OpCode::execute(uint8_t opCode){
             }
             break;
         case 0xF5: // push af
-            // PUSH AF
             this->_cpu->_special_registers.sp--;
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_registers.a);
             this->_cpu->_special_registers.sp--;
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_registers.f());
             break;
         case 0xF6: // or n
-            // OR n
             this->_cpu->_registers.a |= Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
             this->_cpu->_special_registers.pc++;
             this->setFlagsByLogical(false);
@@ -911,7 +888,6 @@ void OpCode::execute(uint8_t opCode){
             }
             break;
         case 0xF9: // ld sp,hl
-            // LD SP, HL
             this->_cpu->_special_registers.sp = this->_cpu->_registers.hl();
             break;
         case 0xFA: // jp m, nn
