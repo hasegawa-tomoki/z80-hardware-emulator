@@ -16,7 +16,7 @@ Work in progress.
 * The level converter used for the Z80 INPUT in the figure above does not work.
 * TXS0108E works properly.
 
-# Credit
+# Thanks/Refs
 
 * [suzukiplan/z80](https://github.com/suzukiplan/z80)
 * [gabrielrcouto/php-terminal-gameboy-emulator](https://github.com/gabrielrcouto/php-terminal-gameboy-emulator)
