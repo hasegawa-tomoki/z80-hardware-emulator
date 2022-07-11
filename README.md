@@ -11,7 +11,7 @@ Work in progress.
 
 # Z80 adapter
 
-![circuit](https://github.com/hasegawa-tomoki/z80-hardware-emulator/blob/main/circuit.png)
+![circuit](https://github.com/hasegawa-tomoki/z80-hardware-emulator/blob/main/images/circuit.png)
 
 * The level converter used for the Z80 INPUT in the figure above does not work.
 * TXS0108E works properly.
