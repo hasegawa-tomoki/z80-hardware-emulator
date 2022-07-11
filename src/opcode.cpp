@@ -754,8 +754,12 @@ void OpCode::execute(uint8_t opCode){
             this->_cpu->_registers.hl((Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp + 1) << 8) + Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp));
             this->_cpu->_special_registers.sp += 2;
             break;
-        case 0xE2: // jp po, nn ToDO: FIXIT
-            Mcycle::m3(this->_cpu, 0xff00 + this->_cpu->_registers.c, this->_cpu->_registers.a);
+        case 0xE2: // jp po, nn
+            if (! this->_cpu->_registers.FPV_ParityOverflow){
+                this->_cpu->_special_registers.pc = (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8) + Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
+            } else {
+                this->_cpu->_special_registers.pc += 2;
+            }
             break;
         case 0xE3: { // ex (sp),hl
             uint8_t mem_value = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp);
