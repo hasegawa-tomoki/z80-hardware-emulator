@@ -138,10 +138,51 @@ void Mcycle::m3(Cpu* cpu, uint16_t addr, uint8_t data){
     cpu->updateControlSignals();
 }
 
-uint8_t Mcycle::in(Cpu* cpu, uint8_t port){
+uint8_t Mcycle::in(Cpu* cpu, uint8_t portL, uint8_t portH){
+    // T1
+    cpu->waitClockRising();
+    cpu->_bus.setAddress((portH << 8) | portL);
+    // T2
+    cpu->waitClockRising();
+    cpu->pin_o_iorq = false;
+    cpu->pin_o_rd = false;
+    cpu->updateControlSignals();
+    // TW
+    cpu->waitClockRising();
+    cpu->waitClockFalling();
+    while (!cpu->pin_i_wait){
+        cpu->waitClockFalling();
+    }
+    // T3
+    cpu->waitClockRising();
+    cpu->waitClockFalling();
+    uint8_t data = cpu->_bus.read();
+    cpu->pin_o_iorq = true;
+    cpu->pin_o_rd = true;
+    cpu->updateControlSignals();
 
+    return data;
 }
 
-void Mcycle::out(Cpu* cpu, uint8_t port, uint8_t data){
-
+void Mcycle::out(Cpu* cpu, uint8_t portL, uint8_t portH, uint8_t data){
+    // T1
+    cpu->waitClockRising();
+    cpu->_bus.setAddress((portH << 8) | portL);
+    // T2
+    cpu->waitClockRising();
+    cpu->pin_o_iorq = false;
+    cpu->pin_o_wr = false;
+    cpu->updateControlSignals();
+    // TW
+    cpu->waitClockRising();
+    cpu->waitClockFalling();
+    while (!cpu->pin_i_wait){
+        cpu->waitClockFalling();
+    }
+    // T3
+    cpu->waitClockRising();
+    cpu->waitClockFalling();
+    cpu->pin_o_iorq = true;
+    cpu->pin_o_wr = true;
+    cpu->updateControlSignals();
 }

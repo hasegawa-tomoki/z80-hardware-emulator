@@ -657,7 +657,7 @@ void OpCode::execute(uint8_t opCode){
             break;
         case 0xD3: { // out (n),a
             uint8_t port = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1);
-            Mcycle::out(this->_cpu, port, this->_cpu->_registers.a);
+            Mcycle::out(this->_cpu, port, this->_cpu->_registers.a, this->_cpu->_registers.a);
             this->_cpu->_special_registers.pc += 1;
             break;
         }
@@ -715,7 +715,7 @@ void OpCode::execute(uint8_t opCode){
             break;
         case 0xDB: { // in a, (n)
             uint8_t port = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1);
-            this->_cpu->_registers.a = Mcycle::in(this->_cpu, port);
+            this->_cpu->_registers.a = Mcycle::in(this->_cpu, port, this->_cpu->_registers.a);
             this->_cpu->_special_registers.pc += 1;
             break;
         }
@@ -1407,7 +1407,7 @@ void OpCode::executeEd(uint8_t opCode){
         case 0x68:
         case 0x78: {
             uint8_t* reg = this->targetRegisterB(0x3A, opCode);
-            uint8_t value = Mcycle::in(this->_cpu, *reg);
+            uint8_t value = Mcycle::in(this->_cpu, *reg, this->_cpu->_registers.b);
             this->_cpu->_registers.FN_Subtract = false;
             this->_cpu->_registers.FH_HalfCarry = false;
             this->_cpu->_registers.FZ_Zero = (value == 0);
@@ -1424,7 +1424,7 @@ void OpCode::executeEd(uint8_t opCode){
         case 0x79: {
             uint8_t* reg = this->targetRegisterB(0x3b, opCode);
             this->_cpu->_special_registers.pc++;
-            Mcycle::out(this->_cpu, this->_cpu->_registers.c, *reg);
+            Mcycle::out(this->_cpu, this->_cpu->_registers.c, this->_cpu->_registers.b, *reg);
             break;
         }
         case 0x42: // sbc hl, bc
@@ -1599,7 +1599,7 @@ void OpCode::executeEd(uint8_t opCode){
             break;
         }
         case 0xA2: { // ini
-            uint8_t value = Mcycle::in(this->_cpu, this->_cpu->_registers.c);
+            uint8_t value = Mcycle::in(this->_cpu, this->_cpu->_registers.c, this->_cpu->_registers.b);
             Mcycle::m3(this->_cpu, this->_cpu->_registers.hl(), value);
             this->_cpu->_registers.b--;
             this->_cpu->_registers.hl(this->_cpu->_registers.hl() + 1);
@@ -1609,7 +1609,7 @@ void OpCode::executeEd(uint8_t opCode){
         }
         case 0xA3: { // outi
             uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
-            Mcycle::out(this->_cpu, this->_cpu->_registers.c, value);
+            Mcycle::out(this->_cpu, this->_cpu->_registers.c, this->_cpu->_registers.b, value);
             this->_cpu->_registers.b--;
             this->_cpu->_registers.hl(this->_cpu->_registers.hl() + 1);
             this->_cpu->_registers.FN_Subtract = true;
@@ -1636,7 +1636,7 @@ void OpCode::executeEd(uint8_t opCode){
             break;
         }
         case 0xAA: { // ind
-            uint8_t value = Mcycle::in(this->_cpu, this->_cpu->_registers.c);
+            uint8_t value = Mcycle::in(this->_cpu, this->_cpu->_registers.c, this->_cpu->_registers.b);
             Mcycle::m3(this->_cpu, this->_cpu->_registers.hl(), value);
             this->_cpu->_registers.b--;
             this->_cpu->_registers.hl(this->_cpu->_registers.hl() - 1);
@@ -1646,7 +1646,7 @@ void OpCode::executeEd(uint8_t opCode){
         }
         case 0xAB: { // outd
             uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
-            Mcycle::out(this->_cpu, this->_cpu->_registers.c, value);
+            Mcycle::out(this->_cpu, this->_cpu->_registers.c, this->_cpu->_registers.b, value);
             this->_cpu->_registers.b--;
             this->_cpu->_registers.hl(this->_cpu->_registers.hl() - 1);
             this->_cpu->_registers.FN_Subtract = true;
@@ -1678,7 +1678,7 @@ void OpCode::executeEd(uint8_t opCode){
         }
         case 0xB2: { // inir
             do {
-                uint8_t value = Mcycle::in(this->_cpu, this->_cpu->_registers.c);
+                uint8_t value = Mcycle::in(this->_cpu, this->_cpu->_registers.c, this->_cpu->_registers.b);
                 Mcycle::m3(this->_cpu, this->_cpu->_registers.hl(), value);
                 this->_cpu->_registers.b--;
                 this->_cpu->_registers.hl(this->_cpu->_registers.hl() + 1);
@@ -1690,7 +1690,7 @@ void OpCode::executeEd(uint8_t opCode){
         case 0xB3: { // otir
             do {
                 uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
-                Mcycle::out(this->_cpu, this->_cpu->_registers.c, value);
+                Mcycle::out(this->_cpu, this->_cpu->_registers.c, this->_cpu->_registers.b, value);
                 this->_cpu->_registers.b--;
                 this->_cpu->_registers.hl(this->_cpu->_registers.hl() + 1);
             } while(this->_cpu->_registers.b > 0);
@@ -1723,7 +1723,7 @@ void OpCode::executeEd(uint8_t opCode){
         }
         case 0xBA: { // indr
             do {
-                uint8_t value = Mcycle::in(this->_cpu, this->_cpu->_registers.c);
+                uint8_t value = Mcycle::in(this->_cpu, this->_cpu->_registers.c, this->_cpu->_registers.b);
                 Mcycle::m3(this->_cpu, this->_cpu->_registers.hl(), value);
                 this->_cpu->_registers.b--;
                 this->_cpu->_registers.hl(this->_cpu->_registers.hl() - 1);
@@ -1735,7 +1735,7 @@ void OpCode::executeEd(uint8_t opCode){
         case 0xBB: { // otdr
             do {
                 uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
-                Mcycle::out(this->_cpu, this->_cpu->_registers.c, value);
+                Mcycle::out(this->_cpu, this->_cpu->_registers.c, this->_cpu->_registers.b, value);
                 this->_cpu->_registers.b--;
                 this->_cpu->_registers.hl(this->_cpu->_registers.hl() - 1);
             } while(this->_cpu->_registers.b > 0);

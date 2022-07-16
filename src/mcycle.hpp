@@ -15,8 +15,8 @@ public:
     static uint8_t m2(Cpu* cpu, uint16_t addr);
     static void m3(Cpu* cpu, uint16_t addr, uint8_t data);
 
-    static uint8_t in(Cpu* cpu, uint8_t port);
-    static void out(Cpu* cpu, uint8_t port, uint8_t data);
+    static uint8_t in(Cpu* cpu, uint8_t portL, uint8_t portH);
+    static void out(Cpu* cpu, uint8_t portL, uint8_t portH, uint8_t data);
 };
 
 #endif //Z80EMU_MCYCLE_HPP
