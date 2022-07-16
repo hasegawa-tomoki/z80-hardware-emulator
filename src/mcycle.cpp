@@ -1,6 +1,7 @@
 #include <cstdint>
 #include "mcycle.hpp"
 #include "cpu.hpp"
+#include "log.hpp"
 
 void Mcycle::int_m1t1t2(Cpu* cpu){
     // t1
@@ -111,6 +112,9 @@ uint8_t Mcycle::m2(Cpu* cpu, uint16_t addr){
     cpu->pin_o_mreq = true;
     cpu->pin_o_rd = true;
     cpu->updateControlSignals();
+
+    Log::mem_read(cpu, addr, data);
+
     return data;
 }
 
@@ -136,6 +140,8 @@ void Mcycle::m3(Cpu* cpu, uint16_t addr, uint8_t data){
     cpu->pin_o_mreq = true;
     cpu->pin_o_wr = true;
     cpu->updateControlSignals();
+
+    Log::mem_write(cpu, addr, data);
 }
 
 uint8_t Mcycle::in(Cpu* cpu, uint8_t portL, uint8_t portH){

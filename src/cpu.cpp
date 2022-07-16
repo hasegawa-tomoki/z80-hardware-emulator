@@ -213,10 +213,10 @@ void Cpu::instructionCycle(){
         Mcycle::m1t3(this);
         Mcycle::m1t4(this);
         this->_opCode.execute(this->executing);
-        Log::dump(this);
 
         // Disable / Enable interrupt
         if (this->waitingEI > 0){
+            Log::step(this, "Enable interrupt");
             this->waitingEI--;
             if (this->waitingEI == 0){
                 this->iff1 = true;
@@ -224,6 +224,7 @@ void Cpu::instructionCycle(){
             }
         }
         if (this->waitingDI > 0){
+            Log::step(this, "Disable interrupt");
             this->waitingDI--;
             if (this->waitingDI == 0){
                 this->iff1 = false;
@@ -233,6 +234,7 @@ void Cpu::instructionCycle(){
 
         // NMI
         if (this->NMI_activated){
+            Log::step(this, "NMI-activated");
             this->NMI_activated = false;
             this->iff2 = this->iff1;
             this->iff1 = false;
@@ -246,6 +248,7 @@ void Cpu::instructionCycle(){
         }
         // INT
         if (this->INT_activated){
+            Log::step(this, "INT-activated");
             this->INT_activated = false;
             Mcycle::int_m1t1t2(this);
             Mcycle::m1t3(this);
