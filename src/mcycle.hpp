@@ -1,6 +1,5 @@
 #ifndef Z80EMU_MCYCLE_HPP
 #define Z80EMU_MCYCLE_HPP
-#include "cpu.hpp"
 
 class Cpu;
 

@@ -1,5 +1,6 @@
 #include <cstdio>
 #include "opcode.hpp"
+#include "cpu.hpp"
 #include "mcycle.hpp"
 #include "stdexcept"
 

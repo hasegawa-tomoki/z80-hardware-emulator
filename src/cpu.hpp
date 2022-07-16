@@ -2,7 +2,6 @@
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #ifndef Z80EMU_Z80_HPP
 #define Z80EMU_Z80_HPP
-#include "mcycle.hpp"
 #include "bus.hpp"
 #include "registers.hpp"
 #include "special_registers.hpp"

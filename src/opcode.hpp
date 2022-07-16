@@ -3,6 +3,7 @@
 #include <cstdint>
 
 class Cpu;
+class Mcycle;
 
 class OpCode {
 public:
@@ -152,7 +153,6 @@ private:
     [[nodiscard]] uint8_t* targetRegisterA(uint8_t offset, uint8_t opCode) const;
     [[nodiscard]] uint8_t* targetRegisterB(int8_t offset, uint8_t opCode) const;
     static uint8_t count1(uint8_t data);
-    void RlFlags(uint8_t data);
     void setFlagsByAddition(uint8_t before, uint8_t addition, bool set_carry = true) const;
     void setFlagsBySubtract(uint8_t before, uint8_t subtract, bool set_carry = true) const;
     void setFlagsByIncrement(uint8_t before) const;

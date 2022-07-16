@@ -4,6 +4,7 @@
 #include "cpu.hpp"
 #include "mcycle.hpp"
 #include "opcode.hpp"
+#include "log.hpp"
 
 Cpu::Cpu(int pi)
 {
@@ -212,6 +213,7 @@ void Cpu::instructionCycle(){
         Mcycle::m1t3(this);
         Mcycle::m1t4(this);
         this->_opCode.execute(this->executing);
+        Log::dump(this);
 
         // Disable / Enable interrupt
         if (this->waitingEI > 0){

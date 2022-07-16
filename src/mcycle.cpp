@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <sstream>
 #include "mcycle.hpp"
+#include "cpu.hpp"
 
 void Mcycle::int_m1t1t2(Cpu* cpu){
     // t1
