@@ -125,12 +125,11 @@ void Cpu::intClock(int pi, unsigned gpio, unsigned level, uint32_t tick, void *c
 {
     Cpu* cpu = static_cast<Cpu*>(cpuObj);
 
-    static int c = 1;
-    if (c % 10 == 0){
-        printf("Interrupt #%d level %d at %u\n", c, level, tick);
-    }
-    c++;
-
+//    static int c = 1;
+//    if (c % 10 == 0){
+//        printf("Interrupt #%d level %d at %u\n", c, level, tick);
+//    }
+//    c++;
     cpu->tick = tick;
     cpu->pin_i_clk_prev = cpu->pin_i_clk;
     cpu->pin_i_clk = level;
