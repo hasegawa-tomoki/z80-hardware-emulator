@@ -1,5 +1,4 @@
 #include <cstdint>
-#include <sstream>
 #include "mcycle.hpp"
 #include "cpu.hpp"
 
