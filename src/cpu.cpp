@@ -131,6 +131,7 @@ void Cpu::intClock(int pi, unsigned gpio, unsigned level, uint32_t tick, void *c
     }
     c++;
 
+    cpu->tick = tick;
     cpu->pin_i_clk_prev = cpu->pin_i_clk;
     cpu->pin_i_clk = level;
 }

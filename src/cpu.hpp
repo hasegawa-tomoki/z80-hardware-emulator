@@ -19,6 +19,8 @@ public:
     Registers _registers;
     Registers _registers_alternate;
 
+    uint32_t tick = 0;
+
     bool iff1 = false;
     bool iff2 = false;
     bool halt = false;
