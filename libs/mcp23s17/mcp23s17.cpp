@@ -18,8 +18,7 @@ int Mcp23s17::init()
     set_mode(this->_pi, GPIO_IORESET, PI_OUTPUT);
 
     int spi_cs = 0;
-    //int spi_baud = 50000;
-    int spi_baud = 20 * 1000 * 1000;
+    int spi_baud = 10 * 1000 * 1000;
     int flag = 0;
     int spi0 = spi_open(this->_pi, spi_cs, spi_baud, flag);
     if (spi0 < 0){
@@ -62,7 +61,7 @@ void Mcp23s17::write_register(uint8_t device_id, uint8_t reg, uint8_t value) con
 
 uint8_t Mcp23s17::read_register(uint8_t device_id, uint8_t reg) const
 {
-    auto command = (uint8_t)(MCP23S17_CMD_READ | (device_id <<1));
+    auto command = (uint8_t)(MCP23S17_CMD_READ | (device_id << 1));
 
     char data[] = {command, reg, 0};
     char buffer[3];
