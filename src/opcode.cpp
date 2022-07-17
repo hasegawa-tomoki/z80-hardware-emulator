@@ -620,7 +620,7 @@ void OpCode::execute(uint8_t opCode){
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc >> 8);
             this->_cpu->_special_registers.sp--;
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc & 0xff);
-            this->_cpu->_special_registers.pc = (uint16_t)(opCode - 0xc7);
+            this->_cpu->_special_registers.pc = (opCode & 0b00111000);
             break;
         case 0xC8: // ret z
             Log::execute(this->_cpu, opCode, "ret z");
