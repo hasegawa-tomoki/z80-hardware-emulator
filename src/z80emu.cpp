@@ -23,6 +23,7 @@ int main(){
     if (! cpu.init()){
         return 1;
     }
+    cpu.resetting = true;
 
     /*
     uint16_t a = 0x0000;
