@@ -41,7 +41,8 @@ void OpCode::execute(uint8_t opCode){
         case 0x2C:
         case 0x3C: {
             Log::execute(this->_cpu, opCode, "inc r");
-            uint8_t* reg = this->targetRegisterB(-2, opCode);
+            //uint8_t* reg = this->targetRegisterB(-2, opCode);
+            uint8_t *reg = this->targetRegister(opCode, 3);
             this->setFlagsByIncrement(*reg);
             (*reg)++;
             break;
@@ -54,7 +55,8 @@ void OpCode::execute(uint8_t opCode){
         case 0x2D:
         case 0x3D: {
             Log::execute(this->_cpu, opCode, "dec r");
-            uint8_t* reg = this->targetRegisterB(-1, opCode);
+            //uint8_t* reg = this->targetRegisterB(-1, opCode);
+            uint8_t *reg = this->targetRegister(opCode, 3);
             this->setFlagsByDecrement(*reg);
             (*reg)--;
             break;
@@ -67,7 +69,8 @@ void OpCode::execute(uint8_t opCode){
         case 0x2e:
         case 0x3e: {
             Log::execute(this->_cpu, opCode, "ld r, n");
-            uint8_t* reg = this->targetRegisterB(0, opCode);
+            //uint8_t* reg = this->targetRegisterB(0, opCode);
+            uint8_t* reg = this->targetRegister(opCode, 3);
             *reg = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
             this->_cpu->_special_registers.pc++;
             break;
@@ -351,7 +354,7 @@ void OpCode::execute(uint8_t opCode){
         case 0x45:
         case 0x47:
             Log::execute(this->_cpu, opCode, "ld b, r");
-            this->_cpu->_registers.b = *(this->targetRegisterA(0x40, opCode));
+            this->_cpu->_registers.b = *(this->targetRegister(opCode, 0));
             break;
         case 0x46: // ld b,(hl)
             Log::execute(this->_cpu, opCode, "ld b,(hl)");
@@ -365,7 +368,7 @@ void OpCode::execute(uint8_t opCode){
         case 0x4d:
         case 0x4f:
             Log::execute(this->_cpu, opCode, "ld c, r");
-            this->_cpu->_registers.c = *(this->targetRegisterA(0x48, opCode));
+            this->_cpu->_registers.c = *(this->targetRegister(opCode, 0));
             break;
         case 0x4E: // ld c,(hl)
             Log::execute(this->_cpu, opCode, "ld c,(hl)");
@@ -379,7 +382,7 @@ void OpCode::execute(uint8_t opCode){
         case 0x55:
         case 0x57:
             Log::execute(this->_cpu, opCode, "ld d, r");
-            this->_cpu->_registers.d = *(this->targetRegisterA(0x50, opCode));
+            this->_cpu->_registers.d = *(this->targetRegister(opCode, 0));
             break;
         case 0x56: // ld d,(hl)
             Log::execute(this->_cpu, opCode, "ld d,(hl)");
@@ -393,7 +396,7 @@ void OpCode::execute(uint8_t opCode){
         case 0x5D:
         case 0x5F:
             Log::execute(this->_cpu, opCode, "ld e, r");
-            this->_cpu->_registers.e = *(this->targetRegisterA(0x58, opCode));
+            this->_cpu->_registers.e = *(this->targetRegister(opCode, 0));
             break;
         case 0x5E: // ld e,(hl)
             Log::execute(this->_cpu, opCode, "ld e,(hl)");
@@ -407,13 +410,13 @@ void OpCode::execute(uint8_t opCode){
         case 0x65:
         case 0x67:
             Log::execute(this->_cpu, opCode, "ld h, r");
-            this->_cpu->_registers.h = *(this->targetRegisterA(0x60, opCode));
+            this->_cpu->_registers.h = *(this->targetRegister(opCode, 0));
             break;
         case 0x66: // ld h,(hl)
             Log::execute(this->_cpu, opCode, "ld h,(hl)");
             this->_cpu->_registers.h = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
             break;
-        case 0x68: // ld h, r
+        case 0x68: // ld l, r
         case 0x69:
         case 0x6A:
         case 0x6B:
@@ -421,7 +424,7 @@ void OpCode::execute(uint8_t opCode){
         case 0x6D:
         case 0x6F:
             Log::execute(this->_cpu, opCode, "ld h, r");
-            this->_cpu->_registers.h = *(this->targetRegisterA(0x68, opCode));
+            this->_cpu->_registers.h = *(this->targetRegister(opCode, 0));
             break;
         case 0x6E: // ld l,(hl)
             Log::execute(this->_cpu, opCode, "ld l,(hl)");
@@ -435,7 +438,7 @@ void OpCode::execute(uint8_t opCode){
         case 0x75:
         case 0x77:
             Log::execute(this->_cpu, opCode, "ld (hl), r");
-            Mcycle::m3(this->_cpu, this->_cpu->_registers.hl(), *(this->targetRegisterA(0x70, opCode)));
+            Mcycle::m3(this->_cpu, this->_cpu->_registers.hl(), *(this->targetRegister(opCode, 0)));
             break;
         case 0x76: // halt
             Log::execute(this->_cpu, opCode, "halt");
@@ -449,7 +452,7 @@ void OpCode::execute(uint8_t opCode){
         case 0x7D:
         case 0x7F:
             Log::execute(this->_cpu, opCode, "ld l, r");
-            this->_cpu->_registers.l = *(this->targetRegisterA(0x78, opCode));
+            this->_cpu->_registers.l = *(this->targetRegister(opCode, 0));
             break;
         case 0x7E: // ld a,(hl)
             Log::execute(this->_cpu, opCode, "ld a,(hl)");
@@ -463,7 +466,7 @@ void OpCode::execute(uint8_t opCode){
         case 0x85:
         case 0x87: {
             Log::execute(this->_cpu, opCode, "add a, r");
-            uint8_t* reg = this->targetRegisterA(0x80, opCode);
+            uint8_t* reg = this->targetRegister(opCode, 0);
             this->setFlagsByAddition(this->_cpu->_registers.a, *reg);
             this->_cpu->_registers.a += *reg;
             break;
@@ -483,7 +486,7 @@ void OpCode::execute(uint8_t opCode){
         case 0x8D:
         case 0x8F: {
             Log::execute(this->_cpu, opCode, "adc a, r");
-            uint8_t* reg = this->targetRegisterA(0x88, opCode);
+            uint8_t* reg = this->targetRegister(opCode, 0);
             uint8_t carry = this->_cpu->_registers.carry_by_val();
             this->setFlagsByAddition(this->_cpu->_registers.a, *reg + carry);
             this->_cpu->_registers.a += *reg + carry;
@@ -504,7 +507,7 @@ void OpCode::execute(uint8_t opCode){
         case 0x95:
         case 0x97: {
             Log::execute(this->_cpu, opCode, "sub r");
-            uint8_t* reg = this->targetRegisterA(0x90, opCode);
+            uint8_t* reg = this->targetRegister(opCode, 0);
             this->setFlagsBySubtract(this->_cpu->_registers.a, *reg);
             this->_cpu->_registers.a -= *reg;
             break;
@@ -524,7 +527,7 @@ void OpCode::execute(uint8_t opCode){
         case 0x9D:
         case 0x9F: {
             Log::execute(this->_cpu, opCode, "sbc a, r");
-            uint8_t* reg = this->targetRegisterA(0x98, opCode);
+            uint8_t* reg = this->targetRegister(opCode, 0);
             uint8_t carry = this->_cpu->_registers.carry_by_val();
             this->setFlagsBySubtract(this->_cpu->_registers.a, *reg + carry);
             this->_cpu->_registers.a -= *reg + carry;
@@ -546,7 +549,7 @@ void OpCode::execute(uint8_t opCode){
         case 0xA5:
         case 0xA7: {
             Log::execute(this->_cpu, opCode, "and r");
-            uint8_t* reg = this->targetRegisterA(0xa0, opCode);
+            uint8_t* reg = this->targetRegister(opCode, 0);
             this->_cpu->_registers.a &= *reg;
             this->setFlagsByLogical(true);
             break;
@@ -564,7 +567,7 @@ void OpCode::execute(uint8_t opCode){
         case 0xAD:
         case 0xAF: {
             Log::execute(this->_cpu, opCode, "xor r");
-            uint8_t* reg = this->targetRegisterA(0xa8, opCode);
+            uint8_t* reg = this->targetRegister(opCode, 0);
             this->_cpu->_registers.a ^= *reg;
             this->setFlagsByLogical(false);
             break;
@@ -582,7 +585,7 @@ void OpCode::execute(uint8_t opCode){
         case 0xB5:
         case 0xB7: {
             Log::execute(this->_cpu, opCode, "or r");
-            uint8_t* reg = this->targetRegisterA(0xb0, opCode);
+            uint8_t* reg = this->targetRegister(opCode, 0);
             this->_cpu->_registers.a |= *reg;
             this->setFlagsByLogical(false);
             break;
@@ -600,7 +603,7 @@ void OpCode::execute(uint8_t opCode){
         case 0xBD:
         case 0xBF:
             Log::execute(this->_cpu, opCode, "cp r");
-            this->setFlagsBySubtract(this->_cpu->_registers.a, *(this->targetRegisterA(0xb8, opCode)));
+            this->setFlagsBySubtract(this->_cpu->_registers.a, *(this->targetRegister(opCode, 0)));
             break;
         case 0xBE: { // cp (hl)
             uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
@@ -1086,7 +1089,7 @@ void OpCode::executeCb(uint8_t opCode) {
         } else {
             // bit b, r
             Log::execute(this->_cpu, opCode, "bit b, r");
-            uint8_t* reg = this->targetRegisterA(0, reg_idx);
+            uint8_t* reg = this->targetRegister(opCode, 0);
             this->_cpu->_registers.FZ_Zero = ((*reg & (1 << bit)) == 0);
         }
         this->_cpu->_registers.FN_Subtract = false;
@@ -1105,7 +1108,7 @@ void OpCode::executeCb(uint8_t opCode) {
         } else {
             // res b, r
             Log::execute(this->_cpu, opCode, "res b, r");
-            uint8_t* reg = this->targetRegisterA(0, reg_idx);
+            uint8_t* reg = this->targetRegister(opCode, 0);
             *reg &= -(*reg & (1 << bit));
         }
         return;
@@ -1122,7 +1125,7 @@ void OpCode::executeCb(uint8_t opCode) {
         } else {
             // set b, r
             Log::execute(this->_cpu, opCode, "set b, r");
-            uint8_t* reg = this->targetRegisterA(0, reg_idx);
+            uint8_t* reg = this->targetRegister(opCode, 0);
             *reg |= (*reg & (1 << bit));
         }
         return;
@@ -1137,7 +1140,7 @@ void OpCode::executeCb(uint8_t opCode) {
         case 0x05:
         case 0x07: {
             Log::execute(this->_cpu, opCode, "rlc r");
-            uint8_t* reg = this->targetRegisterA(0x00, opCode);
+            uint8_t* reg = this->targetRegister(opCode, 0);
             bool carry_bit = ((*reg & 0x80) > 0);
             *reg = (*reg << 1) | (*reg >> 7);
             this->setFlagsByRotate(*reg, carry_bit);
@@ -1160,7 +1163,7 @@ void OpCode::executeCb(uint8_t opCode) {
         case 0x0D:
         case 0x0F: {
             Log::execute(this->_cpu, opCode, "rrc r");
-            uint8_t *reg = this->targetRegisterA(0x00, opCode);
+            uint8_t *reg = this->targetRegister(opCode, 0);
             bool carry_bit = ((*reg & 1) > 0);
             *reg = (*reg >> 1) + ((*reg & 1) << 7);
             this->setFlagsByRotate(*reg, carry_bit);
@@ -1183,7 +1186,7 @@ void OpCode::executeCb(uint8_t opCode) {
         case 0x15:
         case 0x17: {
             Log::execute(this->_cpu, opCode, "rl r");
-            uint8_t* reg = this->targetRegisterA(0x10, opCode);
+            uint8_t* reg = this->targetRegister(opCode, 0);
             bool carry_bit = ((*reg & 0x80) > 0);
             *reg = (*reg << 1) & 0xff | this->_cpu->_registers.carry_by_val();
             this->setFlagsByRotate(*reg, carry_bit);
@@ -1206,7 +1209,7 @@ void OpCode::executeCb(uint8_t opCode) {
         case 0x1D:
         case 0x1F: {
             Log::execute(this->_cpu, opCode, "rr r");
-            uint8_t* reg = this->targetRegisterA(0x18, opCode);
+            uint8_t* reg = this->targetRegister(opCode, 0);
             bool carry_bit = ((*reg & 1) > 0);
             *reg = (*reg >> 1) | (this->_cpu->_registers.carry_by_val() << 7);
             this->setFlagsByRotate(*reg, carry_bit);
@@ -1229,7 +1232,7 @@ void OpCode::executeCb(uint8_t opCode) {
         case 0x25:
         case 0x27: {
             Log::execute(this->_cpu, opCode, "sla r");
-            uint8_t* reg = this->targetRegisterA(0x20, opCode);
+            uint8_t* reg = this->targetRegister(opCode, 0);
             bool carry_bit = ((*reg & 0x80) > 0);
             *reg = (*reg << 1) & 0xff;
             this->setFlagsByRotate(*reg, carry_bit);
@@ -1252,7 +1255,7 @@ void OpCode::executeCb(uint8_t opCode) {
         case 0x2D:
         case 0x2F: {
             Log::execute(this->_cpu, opCode, "sra r");
-            uint8_t* reg = this->targetRegisterA(0x28, opCode);
+            uint8_t* reg = this->targetRegister(opCode, 0);
             bool carry_bit = ((*reg & 0x01) > 0);
             *reg = (*reg & 0x80) | (*reg >> 1);
             this->setFlagsByRotate(*reg, carry_bit);
@@ -1275,7 +1278,7 @@ void OpCode::executeCb(uint8_t opCode) {
         case 0x3D:
         case 0x3F: {
             Log::execute(this->_cpu, opCode, "srl r");
-            uint8_t* reg = this->targetRegisterA(0x28, opCode);
+            uint8_t* reg = this->targetRegister(opCode, 0);
             bool carry_bit = ((*reg & 0x01) > 0);
             *reg >>= 1;
             this->setFlagsByRotate(*reg, carry_bit);
@@ -1391,8 +1394,8 @@ void OpCode::executeDd(uint8_t opCode){
             Log::execute(this->_cpu, opCode, "ld r, (ix + d)");
             auto d = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
             this->_cpu->_special_registers.pc++;
-            uint8_t* targetRegister = this->targetRegisterB(0x40, opCode);
-            *targetRegister = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.ix + d);
+            uint8_t* reg = this->targetRegister(opCode, 3);
+            *reg = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.ix + d);
             break;
         }
         case 0x70: // ld (ix + d), r
@@ -1405,8 +1408,8 @@ void OpCode::executeDd(uint8_t opCode){
             Log::execute(this->_cpu, opCode, "ld (ix + d), r");
             auto d = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
             this->_cpu->_special_registers.pc++;
-            uint8_t* targetRegister = this->targetRegisterA(0x70, opCode);
-            Mcycle::m3(this->_cpu, this->_cpu->_special_registers.ix + d, *targetRegister);
+            uint8_t* reg = this->targetRegister(opCode, 0);
+            Mcycle::m3(this->_cpu, this->_cpu->_special_registers.ix + d, *reg);
             break;
         }
         case 0x86: { // add a, (ix + d)
@@ -1599,7 +1602,7 @@ void OpCode::executeEd(uint8_t opCode){
         case 0x68:
         case 0x78: {
             Log::execute(this->_cpu, opCode, "in r, (c)");
-            uint8_t* reg = this->targetRegisterB(0x3A, opCode);
+            uint8_t* reg = this->targetRegister(opCode, 3);
             uint8_t value = Mcycle::in(this->_cpu, *reg, this->_cpu->_registers.b);
             this->_cpu->_registers.FN_Subtract = false;
             this->_cpu->_registers.FH_HalfCarry = false;
@@ -1616,7 +1619,7 @@ void OpCode::executeEd(uint8_t opCode){
         case 0x69:
         case 0x79: {
             Log::execute(this->_cpu, opCode, "out (c), r");
-            uint8_t* reg = this->targetRegisterB(0x3b, opCode);
+            uint8_t* reg = this->targetRegister(opCode, 3);
             this->_cpu->_special_registers.pc++;
             Mcycle::out(this->_cpu, this->_cpu->_registers.c, this->_cpu->_registers.b, *reg);
             break;
@@ -2075,8 +2078,8 @@ void OpCode::executeFd(uint8_t opCode){
             Log::execute(this->_cpu, opCode, "ld r, (iy + d)");
             auto d = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
             this->_cpu->_special_registers.pc++;
-            uint8_t* targetRegister = this->targetRegisterB(0x40, opCode);
-            *targetRegister = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.iy + d);
+            uint8_t* reg = this->targetRegister(opCode, 3);
+            *reg = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.iy + d);
             break;
         }
         case 0x70: // ld (iy + d), r
@@ -2089,8 +2092,8 @@ void OpCode::executeFd(uint8_t opCode){
             Log::execute(this->_cpu, opCode, "ld (iy + d), r");
             auto d = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
             this->_cpu->_special_registers.pc++;
-            uint8_t* targetRegister = this->targetRegisterA(0x70, opCode);
-            Mcycle::m3(this->_cpu, this->_cpu->_special_registers.iy + d, *targetRegister);
+            uint8_t* reg = this->targetRegister(opCode, 0);
+            Mcycle::m3(this->_cpu, this->_cpu->_special_registers.iy + d, *reg);
             break;
         }
         case 0x86: { // add a, (iy + d)
@@ -2211,6 +2214,7 @@ void OpCode::executeFd(uint8_t opCode){
     }
 }
 
+/*
 uint8_t* OpCode::targetRegisterA(uint8_t offset, uint8_t opCode) const{
     switch (opCode - offset){
         case 0: return &(this->_cpu->_registers.b);
@@ -2228,7 +2232,7 @@ uint8_t* OpCode::targetRegisterA(uint8_t offset, uint8_t opCode) const{
     }
 }
 
-uint8_t* OpCode::targetRegisterB(int8_t offset, uint8_t opCode) const {
+ uint8_t* OpCode::targetRegisterB(int8_t offset, uint8_t opCode) const {
     switch(opCode - offset){
         case 0x06: return &(this->_cpu->_registers.b);
         case 0x0E: return &(this->_cpu->_registers.c);
@@ -2240,6 +2244,26 @@ uint8_t* OpCode::targetRegisterB(int8_t offset, uint8_t opCode) const {
         default:
             char error[100];
             sprintf(error, "Invalid target register code: %02x", opCode);
+            Log::error(this->_cpu, error);
+            throw std::runtime_error(error);
+    }
+}
+*/
+
+uint8_t* OpCode::targetRegister(uint8_t opCode, int lsb) const {
+    uint8_t reg_idx = ((opCode >> lsb) & 0b00000111);
+
+    switch(reg_idx){
+        case 0b000: { Log::target_register(this->_cpu, "b"); return &(this->_cpu->_registers.b); }
+        case 0b001: { Log::target_register(this->_cpu, "c"); return &(this->_cpu->_registers.c); }
+        case 0b010: { Log::target_register(this->_cpu, "d"); return &(this->_cpu->_registers.d); }
+        case 0b011: { Log::target_register(this->_cpu, "e"); return &(this->_cpu->_registers.e); }
+        case 0b100: { Log::target_register(this->_cpu, "h"); return &(this->_cpu->_registers.h); }
+        case 0b101: { Log::target_register(this->_cpu, "l"); return &(this->_cpu->_registers.l); }
+        case 0b111: { Log::target_register(this->_cpu, "a"); return &(this->_cpu->_registers.a); }
+        default:
+            char error[100];
+            sprintf(error, "Invalid target register code: %02x with lsb %d", opCode, lsb);
             Log::error(this->_cpu, error);
             throw std::runtime_error(error);
     }

@@ -17,7 +17,7 @@ void Mcycle::int_m1t1t2(Cpu* cpu){
     // tw
     cpu->waitClockRising();
     cpu->waitClockFalling();
-    while (!cpu->pin_i_wait){
+    while (! cpu->pin_i_wait){
         cpu->waitClockFalling();
     }
 }
@@ -43,7 +43,7 @@ void Mcycle::m1t2(Cpu* cpu){
         return;
     }
     cpu->waitClockFalling();
-    while (!cpu->pin_i_wait){
+    while (! cpu->pin_i_wait){
         cpu->waitClockFalling();
     }
 }
@@ -147,7 +147,8 @@ void Mcycle::m3(Cpu* cpu, uint16_t addr, uint8_t data){
 uint8_t Mcycle::in(Cpu* cpu, uint8_t portL, uint8_t portH){
     // T1
     cpu->waitClockRising();
-    cpu->_bus.setAddress((portH << 8) | portL);
+    uint16_t port = (portH << 8) | portL;
+    cpu->_bus.setAddress(port);
     // T2
     cpu->waitClockRising();
     cpu->pin_o_iorq = false;
@@ -156,7 +157,7 @@ uint8_t Mcycle::in(Cpu* cpu, uint8_t portL, uint8_t portH){
     // TW
     cpu->waitClockRising();
     cpu->waitClockFalling();
-    while (!cpu->pin_i_wait){
+    while (! cpu->pin_i_wait){
         cpu->waitClockFalling();
     }
     // T3
@@ -167,13 +168,16 @@ uint8_t Mcycle::in(Cpu* cpu, uint8_t portL, uint8_t portH){
     cpu->pin_o_rd = true;
     cpu->updateControlSignals();
 
+    Log::io_read(cpu, port, data);
+
     return data;
 }
 
 void Mcycle::out(Cpu* cpu, uint8_t portL, uint8_t portH, uint8_t data){
     // T1
     cpu->waitClockRising();
-    cpu->_bus.setAddress((portH << 8) | portL);
+    uint16_t port = (portH << 8) | portL;
+    cpu->_bus.setAddress(port);
     // T2
     cpu->waitClockRising();
     cpu->pin_o_iorq = false;
@@ -182,7 +186,7 @@ void Mcycle::out(Cpu* cpu, uint8_t portL, uint8_t portH, uint8_t data){
     // TW
     cpu->waitClockRising();
     cpu->waitClockFalling();
-    while (!cpu->pin_i_wait){
+    while (! cpu->pin_i_wait){
         cpu->waitClockFalling();
     }
     // T3
@@ -191,4 +195,6 @@ void Mcycle::out(Cpu* cpu, uint8_t portL, uint8_t portH, uint8_t data){
     cpu->pin_o_iorq = true;
     cpu->pin_o_wr = true;
     cpu->updateControlSignals();
+
+    Log::io_write(cpu, port, data);
 }

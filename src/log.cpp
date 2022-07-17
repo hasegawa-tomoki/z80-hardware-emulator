@@ -7,10 +7,9 @@ void Log::write(Cpu* cpu, char* string){
     static std::ofstream stream("log.txt");
     char buffer[400];
     snprintf(buffer, sizeof(buffer), "tick:%010u\t%s", cpu->tick, string);
-    //printf("%s\n", buffer);
 
     stream << buffer << std::endl;
-    stream.flush();
+//    stream.flush();
 }
 
 void Log::execute(Cpu* cpu, uint8_t op_code, const char* mnemonic){
@@ -19,21 +18,15 @@ void Log::execute(Cpu* cpu, uint8_t op_code, const char* mnemonic){
     write(cpu, buffer);
 }
 
-void Log::before_m1(Cpu* cpu){
-    char buffer[400];
-    snprintf(buffer, sizeof(buffer), "step:before-m1\tpc:%04x", cpu->_special_registers.pc);
-    write(cpu, buffer);
-}
-
-void Log::after_m1(Cpu* cpu){
-    char buffer[400];
-    snprintf(buffer, sizeof(buffer), "step:after-m1\topcode:%02x", cpu->executing);
-    write(cpu, buffer);
-}
-
 void Log::step(Cpu* cpu, const char* step){
     char buffer[400];
     snprintf(buffer, sizeof(buffer), "step:%s", step);
+    write(cpu, buffer);
+}
+
+void Log::target_register(Cpu* cpu, const char* reg_name){
+    char buffer[400];
+    snprintf(buffer, sizeof(buffer), "step:register\tregister:%s", reg_name);
     write(cpu, buffer);
 }
 
@@ -52,5 +45,17 @@ void Log::mem_read(Cpu* cpu, uint16_t addr, uint8_t data){
 void Log::mem_write(Cpu* cpu, uint16_t addr, uint8_t data){
     char buffer[400];
     snprintf(buffer, sizeof(buffer), "step:m3(write)\taddr:%04x\tdata:%02x", addr, data);
+    write(cpu, buffer);
+}
+
+void Log::io_read(Cpu* cpu, uint16_t addr, uint8_t data){
+    char buffer[400];
+    snprintf(buffer, sizeof(buffer), "step:io(read)\taddr:%04x\tdata:%02x", addr, data);
+    write(cpu, buffer);
+}
+
+void Log::io_write(Cpu* cpu, uint16_t addr, uint8_t data){
+    char buffer[400];
+    snprintf(buffer, sizeof(buffer), "step:io(write)\taddr:%04x\tdata:%02x", addr, data);
     write(cpu, buffer);
 }

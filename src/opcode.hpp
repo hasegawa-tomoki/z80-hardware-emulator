@@ -150,8 +150,9 @@ public:
             0x8A50, 0x8B50, 0x8C50, 0x8D50, 0x8E50, 0x8F50, 0x9050, 0x9150, 0x9250, 0x9350, 0x9450, 0x9550, 0x9650, 0x9750, 0x9850, 0x9950,
     };
 private:
-    [[nodiscard]] uint8_t* targetRegisterA(uint8_t offset, uint8_t opCode) const;
-    [[nodiscard]] uint8_t* targetRegisterB(int8_t offset, uint8_t opCode) const;
+    //[[nodiscard]] uint8_t* targetRegisterA(uint8_t offset, uint8_t opCode) const;
+    //[[nodiscard]] uint8_t* targetRegisterB(int8_t offset, uint8_t opCode) const;
+    [[nodiscard]] uint8_t* targetRegister(uint8_t opCode, int lsb) const;
     static uint8_t count1(uint8_t data);
     void setFlagsByAddition(uint8_t before, uint8_t addition, bool set_carry = true) const;
     void setFlagsBySubtract(uint8_t before, uint8_t subtract, bool set_carry = true) const;
