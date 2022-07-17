@@ -75,15 +75,16 @@ public:
     void updateControlSignals();
 
     static void intReset(int pi, unsigned gpio, unsigned level, uint32_t tick, void *z80obj);
-    static void intClock(int pi, unsigned gpio, unsigned level, uint32_t tick, void *z80obj);
+    //static void intClock(int pi, unsigned gpio, unsigned level, uint32_t tick, void *z80obj);
     static void intWait(int pi, unsigned gpio, unsigned level, uint32_t tick, void *z80obj);
     static void intNmi(int pi, unsigned gpio, unsigned level, uint32_t tick, void *z80obj);
     static void intInt(int pi, unsigned gpio, unsigned level, uint32_t tick, void *z80obj);
 
-    bool clockRising();
-    bool clockFalling();
-    void waitClockRising();
-    void waitClockFalling();
+    //bool clockRising();
+    //bool clockFalling();
+    void waitClockRising() const;
+    void waitClockFalling() const;
+    bool readGpio(uint8_t gpio) const;
     bool nmiFalling();
     bool intFalling();
 

@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <ctime>
 #include <pigpiod_if2.h>
 #include "stdexcept"
 #include "cpu.hpp"
@@ -30,11 +31,13 @@ bool Cpu::init()
     SpecialRegisters specialResistors;
     this->_special_registers = specialResistors;
 
+    /*
     int idClock = callback_ex(this->_pi, Z80_GPIO_CLK, EITHER_EDGE, Cpu::intClock, this);
     if (idClock < 0){
         printf("Error callback_ex() for Z80_GPIO_CLK");
         return false;
     }
+     */
     int idReset = callback_ex(this->_pi, Z80_GPIO_RESET, EITHER_EDGE, Cpu::intReset, this);
     if (idReset < 0){
         printf("Error callback_ex() for Z80_GPIO_RESET");
@@ -120,11 +123,23 @@ void Cpu::intReset(int pi, unsigned gpio, unsigned level, uint32_t tick, void *c
 }
 #pragma clang diagnostic pop
 
+/*
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnusedParameter"
 void Cpu::intClock(int pi, unsigned gpio, unsigned level, uint32_t tick, void *cpuObj)
 {
     Cpu* cpu = static_cast<Cpu*>(cpuObj);
+
+    static int c = 0;
+    static clock_t start = clock();
+    c++;
+    if (c == 1000000){
+        const double time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC * 1000.0;
+        printf("1,000,000 clock in %lf msec.\n", time);
+        start = clock();
+        c = 0;
+    }
+
 
 //    static int c = 1;
 //    if (c % 10 == 0){
@@ -136,6 +151,7 @@ void Cpu::intClock(int pi, unsigned gpio, unsigned level, uint32_t tick, void *c
     cpu->pin_i_clk = level;
 }
 #pragma clang diagnostic pop
+*/
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnusedParameter"
@@ -163,7 +179,7 @@ void Cpu::intInt(int pi, unsigned gpio, unsigned level, uint32_t tick, void *cpu
 }
 #pragma clang diagnostic pop
 
-
+/*
 bool Cpu::clockRising(){
     if (!this->pin_i_clk_prev && this->pin_i_clk){
         this->pin_i_clk_prev = this->pin_i_clk;
@@ -184,6 +200,24 @@ void Cpu::waitClockRising(){
 void Cpu::waitClockFalling(){
     while(! this->clockFalling());
 }
+ */
+
+void Cpu::waitClockRising() const{
+    while(! this->readGpio(Z80_GPIO_CLK));
+}
+void Cpu::waitClockFalling() const{
+    while(this->readGpio(Z80_GPIO_CLK));
+}
+
+bool Cpu::readGpio(uint8_t gpio) const {
+    uint32_t data;
+    if (gpio <= 31){
+        data = read_bank_1(this->_pi);
+        return (data & (1 << gpio)) > 0;
+    }
+    data = read_bank_2(this->_pi);
+    return (data & (1 << (gpio - 32))) > 0;
+}
 
 bool Cpu::nmiFalling(){
     if (this->pin_i_nmi_prev && !this->pin_i_nmi){
@@ -203,9 +237,11 @@ bool Cpu::intFalling(){
 void Cpu::instructionCycle(){
     #pragma clang diagnostic push
     #pragma ide diagnostic ignored "EndlessLoop"
+    int instructions = 0;
+    clock_t start = clock();
     while(true){
         if (this->resetting){
-            printf("Resetting");
+            printf("Resetting\n");
             this->reset();
         }
         Mcycle::m1t1(this);
@@ -277,6 +313,14 @@ void Cpu::instructionCycle(){
                 default:
                     throw std::runtime_error("Invalid interrupt mode.");
             }
+        }
+
+        instructions++;
+        if (instructions == 1000){
+            const double time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC * 1000.0;
+            printf("1,000 instructions in %lf msec.\n", time);
+            start = clock();
+            instructions = 0;
         }
     }
     #pragma clang diagnostic pop

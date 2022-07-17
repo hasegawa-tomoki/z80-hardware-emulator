@@ -10,10 +10,13 @@ void Mcycle::int_m1t1t2(Cpu* cpu){
     cpu->pin_o_mreq = true;
     cpu->pin_o_rd = true;
     cpu->pin_o_m1 = false;
+    cpu->waitClockFalling();
     // t2
     cpu->waitClockRising();
+    cpu->waitClockFalling();
     // tw
     cpu->waitClockRising();
+    cpu->waitClockFalling();
     // tw
     cpu->waitClockRising();
     cpu->waitClockFalling();
@@ -34,6 +37,7 @@ void Mcycle::m1t1(Cpu* cpu){
     cpu->pin_o_rd = false;
     cpu->pin_o_m1 = false;
     cpu->updateControlSignals();
+    cpu->waitClockFalling();
 }
 
 void Mcycle::m1t2(Cpu* cpu){
@@ -74,6 +78,7 @@ void Mcycle::m1t4(Cpu* cpu) {
     // T4: Inactivate MREQ, RFSH. Increment R resistor.
     cpu->waitClockRising();
     if (! cpu->halt){
+        cpu->waitClockFalling();
         cpu->pin_o_mreq = true;
         cpu->updateControlSignals();
     }
@@ -96,6 +101,7 @@ uint8_t Mcycle::m2(Cpu* cpu, uint16_t addr){
     // T1
     cpu->waitClockRising();
     cpu->_bus.setAddress(addr);
+    cpu->waitClockFalling();
     cpu->pin_o_mreq = false;
     cpu->pin_o_rd = false;
     cpu->updateControlSignals();
@@ -122,9 +128,9 @@ void Mcycle::m3(Cpu* cpu, uint16_t addr, uint8_t data){
     // T1
     cpu->waitClockRising();
     cpu->_bus.setAddress(addr);
+    cpu->waitClockFalling();
     cpu->pin_o_mreq = false;
     cpu->updateControlSignals();
-    cpu->waitClockFalling();
     cpu->_bus.write(data);
     // T2
     cpu->waitClockRising();
@@ -149,11 +155,13 @@ uint8_t Mcycle::in(Cpu* cpu, uint8_t portL, uint8_t portH){
     cpu->waitClockRising();
     uint16_t port = (portH << 8) | portL;
     cpu->_bus.setAddress(port);
+    cpu->waitClockFalling();
     // T2
     cpu->waitClockRising();
     cpu->pin_o_iorq = false;
     cpu->pin_o_rd = false;
     cpu->updateControlSignals();
+    cpu->waitClockFalling();
     // TW
     cpu->waitClockRising();
     cpu->waitClockFalling();
@@ -178,11 +186,13 @@ void Mcycle::out(Cpu* cpu, uint8_t portL, uint8_t portH, uint8_t data){
     cpu->waitClockRising();
     uint16_t port = (portH << 8) | portL;
     cpu->_bus.setAddress(port);
+    cpu->waitClockFalling();
     // T2
     cpu->waitClockRising();
     cpu->pin_o_iorq = false;
     cpu->pin_o_wr = false;
     cpu->updateControlSignals();
+    cpu->waitClockFalling();
     // TW
     cpu->waitClockRising();
     cpu->waitClockFalling();
