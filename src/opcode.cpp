@@ -499,6 +499,7 @@ void OpCode::execute(uint8_t opCode){
             break;
         }
         case 0x8E: { // adc a, (hl)
+            Log::execute(this->_cpu, opCode, "adc a, (hl)");
             uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
             uint8_t carry = this->_cpu->_registers.carry_by_val();
             this->setFlagsByAddition(this->_cpu->_registers.a, value + carry);
@@ -612,6 +613,7 @@ void OpCode::execute(uint8_t opCode){
             this->setFlagsBySubtract(this->_cpu->_registers.a, *(this->targetRegister(opCode, 0)));
             break;
         case 0xBE: { // cp (hl)
+            Log::execute(this->_cpu, opCode, "cp (hl)");
             uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
             this->setFlagsBySubtract(this->_cpu->_registers.a, value);
             break;

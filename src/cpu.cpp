@@ -168,6 +168,7 @@ void Cpu::intWait(int pi, unsigned gpio, unsigned level, uint32_t tick, void *cp
 #pragma ide diagnostic ignored "UnusedParameter"
 void Cpu::intNmi(int pi, unsigned gpio, unsigned level, uint32_t tick, void *cpuObj){
     Cpu* cpu = static_cast<Cpu*>(cpuObj);
+    Log::general(cpu, "intNmi");
     cpu->pin_i_nmi_prev = cpu->pin_i_nmi;
     cpu->pin_i_nmi = level;
 }
@@ -177,6 +178,7 @@ void Cpu::intNmi(int pi, unsigned gpio, unsigned level, uint32_t tick, void *cpu
 #pragma ide diagnostic ignored "UnusedParameter"
 void Cpu::intInt(int pi, unsigned gpio, unsigned level, uint32_t tick, void *cpuObj){
     Cpu* cpu = static_cast<Cpu*>(cpuObj);
+    Log::general(cpu, "intInt");
     cpu->pin_i_int_prev = cpu->pin_i_int;
     cpu->pin_i_int = level;
 }
@@ -255,7 +257,7 @@ void Cpu::instructionCycle(){
 
         // Disable / Enable interrupt
         if (this->waitingEI > 0){
-            Log::step(this, "Enable interrupt");
+            Log::general(this, "Enable interrupt");
             this->waitingEI--;
             if (this->waitingEI == 0){
                 this->iff1 = true;
@@ -263,7 +265,7 @@ void Cpu::instructionCycle(){
             }
         }
         if (this->waitingDI > 0){
-            Log::step(this, "Disable interrupt");
+            Log::general(this, "Disable interrupt");
             this->waitingDI--;
             if (this->waitingDI == 0){
                 this->iff1 = false;
@@ -273,7 +275,7 @@ void Cpu::instructionCycle(){
 
         // NMI
         if (this->NMI_activated){
-            Log::step(this, "NMI-activated");
+            Log::general(this, "NMI-activated");
             this->NMI_activated = false;
             this->iff2 = this->iff1;
             this->iff1 = false;
@@ -287,7 +289,7 @@ void Cpu::instructionCycle(){
         }
         // INT
         if (this->INT_activated){
-            Log::step(this, "INT-activated");
+            Log::general(this, "INT-activated");
             this->INT_activated = false;
             Mcycle::int_m1t1t2(this);
             Mcycle::m1t3(this);
@@ -307,9 +309,10 @@ void Cpu::instructionCycle(){
                     this->_special_registers.pc = 0x0038;
                     break;
                 case 2: {
-                    uint16_t int_vector_pointer = (this->_special_registers.i << 8) + int_vector;
-                    uint16_t int_vector_addr = Mcycle::m2(this, (int_vector_pointer + 1) << 8) +
-                                               Mcycle::m2(this, int_vector_pointer);
+                    uint16_t int_vector_pointer = (this->_special_registers.i << 8) + (int_vector & 0b11111110);
+                    uint16_t int_vector_addr =
+                            Mcycle::m2(this, int_vector_pointer) +
+                            (Mcycle::m2(this, int_vector_pointer + 1) << 8);
                     this->_special_registers.pc = int_vector_addr;
                     break;
                 }
