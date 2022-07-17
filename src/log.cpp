@@ -2,14 +2,16 @@
 #include "cpu.hpp"
 #include <string>
 #include <fstream>
+#include "config.hpp"
 
 void Log::write(Cpu* cpu, char* string){
+#ifdef Z80EMU_ENABLE_LOG
     static std::ofstream stream("log.txt");
     char buffer[400];
     snprintf(buffer, sizeof(buffer), "tick:%010u\t%s", cpu->tick, string);
 
     stream << buffer << std::endl;
-//    stream.flush();
+#endif //Z80EMU_ENABLE_LOG
 }
 
 void Log::execute(Cpu* cpu, uint8_t op_code, const char* mnemonic){

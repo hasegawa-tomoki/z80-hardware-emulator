@@ -16,7 +16,7 @@ add_executable(z80emu
         src/mcycle.cpp
         src/opcode.cpp
         src/log.cpp
-)
+        src/config.hpp)
 
 target_link_libraries(
         z80emu
