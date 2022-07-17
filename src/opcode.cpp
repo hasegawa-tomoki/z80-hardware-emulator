@@ -33,8 +33,8 @@ void OpCode::execute(uint8_t opCode){
             this->_cpu->_registers.b = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1);
             this->_cpu->_special_registers.pc += 2;
             break;
-        case 0x02: { // ld (bc),a
-            Log::execute(this->_cpu, opCode, "ld (bc),a");
+        case 0x02: { // ld (bc), a
+            Log::execute(this->_cpu, opCode, "ld (bc), a");
             uint8_t addr = (this->_cpu->_registers.b << 8) + this->_cpu->_registers.c;
             Mcycle::m3(this->_cpu, addr, this->_cpu->_registers.a);
             break;
@@ -589,7 +589,7 @@ void OpCode::execute(uint8_t opCode){
                 Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc & 0xff);
                 this->_cpu->_special_registers.pc = jump_addr;
             } else {
-                this->_cpu->_special_registers.pc = (this->_cpu->_special_registers.pc + 2) & 0xffff;
+                this->_cpu->_special_registers.pc += 2;
             }
             break;
         case 0xC5: // push bc
@@ -877,7 +877,7 @@ void OpCode::execute(uint8_t opCode){
                 Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc & 0xff);
                 this->_cpu->_special_registers.pc = jump_addr;
             } else {
-                this->_cpu->_special_registers.pc = (this->_cpu->_special_registers.pc + 2) & 0xffff;
+                this->_cpu->_special_registers.pc += 2;
             }
             break;
         case 0xE5: // push hl
@@ -936,7 +936,7 @@ void OpCode::execute(uint8_t opCode){
                 Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc & 0xff);
                 this->_cpu->_special_registers.pc = jump_addr;
             } else {
-                this->_cpu->_special_registers.pc = (this->_cpu->_special_registers.pc + 2) & 0xffff;
+                this->_cpu->_special_registers.pc += 2;
             }
             break;
         case 0xED: { // EXTD
@@ -999,7 +999,7 @@ void OpCode::execute(uint8_t opCode){
                 Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc & 0xff);
                 this->_cpu->_special_registers.pc = jump_addr;
             } else {
-                this->_cpu->_special_registers.pc = (this->_cpu->_special_registers.pc + 2) & 0xffff;
+                this->_cpu->_special_registers.pc += 2;
             }
             break;
         case 0xF5: // push af
@@ -1055,7 +1055,7 @@ void OpCode::execute(uint8_t opCode){
                 Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc & 0xff);
                 this->_cpu->_special_registers.pc = jump_addr;
             } else {
-                this->_cpu->_special_registers.pc = (this->_cpu->_special_registers.pc + 2) & 0xffff;
+                this->_cpu->_special_registers.pc += 2;
             }
             break;
         case 0xFD: { // IY
