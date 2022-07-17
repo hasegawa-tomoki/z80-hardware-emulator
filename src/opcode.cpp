@@ -13,6 +13,16 @@ OpCode::OpCode(Cpu* cpu) {
 }
 
 void OpCode::execute(uint8_t opCode){
+    if ((opCode >> 6) == 0b01 && (opCode & 0b00111000) != 0b00110000 && (opCode & 0b00000111) != 0b00000110){
+        // ld r, r'
+        Log::execute(this->_cpu, opCode, "ld r, r'");
+        uint8_t *reg = this->targetRegister(opCode, 3);
+        uint8_t *reg_dash = this->targetRegister(opCode, 0);
+        *reg = *reg_dash;
+        Log::dump_registers(this->_cpu);
+        return;
+    }
+
     switch (opCode){
         case 0x00: // nop
             Log::execute(this->_cpu, opCode, "nop");
@@ -352,90 +362,17 @@ void OpCode::execute(uint8_t opCode){
             this->_cpu->_registers.FH_HalfCarry = saved_carry;
             break;
         }
-        case 0x40: // ld b, r
-        case 0x41:
-        case 0x42:
-        case 0x43:
-        case 0x44:
-        case 0x45:
-        case 0x47:
-            Log::execute(this->_cpu, opCode, "ld b, r");
-            this->_cpu->_registers.b = *(this->targetRegister(opCode, 0));
+        case 0x46: // ld r, (hl)
+        case 0x4E:
+        case 0x56:
+        case 0x5E:
+        case 0x66:
+        case 0x6E: {
+            Log::execute(this->_cpu, opCode, "ld r, (hl)");
+            uint8_t *reg = this->targetRegister(opCode, 3);
+            *reg = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
             break;
-        case 0x46: // ld b,(hl)
-            Log::execute(this->_cpu, opCode, "ld b,(hl)");
-            this->_cpu->_registers.b = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
-            break;
-        case 0x48: // ld c, r
-        case 0x49:
-        case 0x4a:
-        case 0x4b:
-        case 0x4c:
-        case 0x4d:
-        case 0x4f:
-            Log::execute(this->_cpu, opCode, "ld c, r");
-            this->_cpu->_registers.c = *(this->targetRegister(opCode, 0));
-            break;
-        case 0x4E: // ld c,(hl)
-            Log::execute(this->_cpu, opCode, "ld c,(hl)");
-            this->_cpu->_registers.c = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
-            break;
-        case 0x50: // ld d, r
-        case 0x51:
-        case 0x52:
-        case 0x53:
-        case 0x54:
-        case 0x55:
-        case 0x57:
-            Log::execute(this->_cpu, opCode, "ld d, r");
-            this->_cpu->_registers.d = *(this->targetRegister(opCode, 0));
-            break;
-        case 0x56: // ld d,(hl)
-            Log::execute(this->_cpu, opCode, "ld d,(hl)");
-            this->_cpu->_registers.d = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
-            break;
-        case 0x58: // ld e, r
-        case 0x59:
-        case 0x5A:
-        case 0x5B:
-        case 0x5C:
-        case 0x5D:
-        case 0x5F:
-            Log::execute(this->_cpu, opCode, "ld e, r");
-            this->_cpu->_registers.e = *(this->targetRegister(opCode, 0));
-            break;
-        case 0x5E: // ld e,(hl)
-            Log::execute(this->_cpu, opCode, "ld e,(hl)");
-            this->_cpu->_registers.e = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
-            break;
-        case 0x60: // ld h, r
-        case 0x61:
-        case 0x62:
-        case 0x63:
-        case 0x64:
-        case 0x65:
-        case 0x67:
-            Log::execute(this->_cpu, opCode, "ld h, r");
-            this->_cpu->_registers.h = *(this->targetRegister(opCode, 0));
-            break;
-        case 0x66: // ld h,(hl)
-            Log::execute(this->_cpu, opCode, "ld h,(hl)");
-            this->_cpu->_registers.h = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
-            break;
-        case 0x68: // ld l, r
-        case 0x69:
-        case 0x6A:
-        case 0x6B:
-        case 0x6C:
-        case 0x6D:
-        case 0x6F:
-            Log::execute(this->_cpu, opCode, "ld h, r");
-            this->_cpu->_registers.h = *(this->targetRegister(opCode, 0));
-            break;
-        case 0x6E: // ld l,(hl)
-            Log::execute(this->_cpu, opCode, "ld l,(hl)");
-            this->_cpu->_registers.l = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
-            break;
+        }
         case 0x70: // ld (hl), r
         case 0x71:
         case 0x72:
@@ -449,16 +386,6 @@ void OpCode::execute(uint8_t opCode){
         case 0x76: // halt
             Log::execute(this->_cpu, opCode, "halt");
             this->_cpu->halt = true;
-            break;
-        case 0x78: // ld l, r
-        case 0x79:
-        case 0x7A:
-        case 0x7B:
-        case 0x7C:
-        case 0x7D:
-        case 0x7F:
-            Log::execute(this->_cpu, opCode, "ld l, r");
-            this->_cpu->_registers.l = *(this->targetRegister(opCode, 0));
             break;
         case 0x7E: // ld a,(hl)
             Log::execute(this->_cpu, opCode, "ld a,(hl)");
@@ -909,6 +836,7 @@ void OpCode::execute(uint8_t opCode){
                         (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp + 1) << 8);
                 this->_cpu->_special_registers.sp += 2;
             }
+            break;
         case 0xE1: // pop hl
             Log::execute(this->_cpu, opCode, "pop hl");
             this->_cpu->_registers.hl(
@@ -987,6 +915,7 @@ void OpCode::execute(uint8_t opCode){
             } else {
                 this->_cpu->_special_registers.pc += 2;
             }
+            break;
         case 0xEB: { // ex de,hl
             Log::execute(this->_cpu, opCode, "ex de,hl");
             uint16_t de = this->_cpu->_registers.de();
@@ -1009,6 +938,7 @@ void OpCode::execute(uint8_t opCode){
             } else {
                 this->_cpu->_special_registers.pc = (this->_cpu->_special_registers.pc + 2) & 0xffff;
             }
+            break;
         case 0xED: { // EXTD
             Log::execute(this->_cpu, opCode, "EXTD");
             uint8_t opcode = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
@@ -1030,6 +960,7 @@ void OpCode::execute(uint8_t opCode){
                         (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp + 1) << 8);
                 this->_cpu->_special_registers.sp += 2;
             }
+            break;
         case 0xF1: { // pop af
             Log::execute(this->_cpu, opCode, "pop af");
             uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp);
@@ -1050,6 +981,7 @@ void OpCode::execute(uint8_t opCode){
             } else {
                 this->_cpu->_special_registers.pc += 2;
             }
+            break;
         case 0xF3: // di
             Log::execute(this->_cpu, opCode, "di");
             this->_cpu->waitingDI = 1;
@@ -1706,6 +1638,7 @@ void OpCode::executeEd(uint8_t opCode){
             }
             uint16_t carry = this->_cpu->_registers.carry_by_val();
             this->setFlagsBySbc16(this->_cpu->_registers.hl(), value + carry);
+            break;
         }
         case 0x43: { // ld (nn), bc
             Log::execute(this->_cpu, opCode, "ld (nn), bc");
@@ -2296,42 +2229,6 @@ void OpCode::executeFd(uint8_t opCode){
     }
 }
 
-/*
-uint8_t* OpCode::targetRegisterA(uint8_t offset, uint8_t opCode) const{
-    switch (opCode - offset){
-        case 0: return &(this->_cpu->_registers.b);
-        case 1: return &(this->_cpu->_registers.c);
-        case 2: return &(this->_cpu->_registers.d);
-        case 3: return &(this->_cpu->_registers.e);
-        case 4: return &(this->_cpu->_registers.h);
-        case 5: return &(this->_cpu->_registers.l);
-        case 7: return &(this->_cpu->_registers.a);
-        default:
-            char error[100];
-            sprintf(error, "Invalid target register code: %02x", opCode);
-            Log::error(this->_cpu, error);
-            throw std::runtime_error(error);
-    }
-}
-
- uint8_t* OpCode::targetRegisterB(int8_t offset, uint8_t opCode) const {
-    switch(opCode - offset){
-        case 0x06: return &(this->_cpu->_registers.b);
-        case 0x0E: return &(this->_cpu->_registers.c);
-        case 0x16: return &(this->_cpu->_registers.d);
-        case 0x1E: return &(this->_cpu->_registers.e);
-        case 0x26: return &(this->_cpu->_registers.h);
-        case 0x2E: return &(this->_cpu->_registers.l);
-        case 0x3E: return &(this->_cpu->_registers.a);
-        default:
-            char error[100];
-            sprintf(error, "Invalid target register code: %02x", opCode);
-            Log::error(this->_cpu, error);
-            throw std::runtime_error(error);
-    }
-}
-*/
-
 uint8_t* OpCode::targetRegister(uint8_t opCode, int lsb) const {
     uint8_t reg_idx = ((opCode >> lsb) & 0b00000111);
 
@@ -2345,7 +2242,7 @@ uint8_t* OpCode::targetRegister(uint8_t opCode, int lsb) const {
         case 0b111: { Log::target_register(this->_cpu, "a"); return &(this->_cpu->_registers.a); }
         default:
             char error[100];
-            sprintf(error, "Invalid target register code: %02x with lsb %d", opCode, lsb);
+            sprintf(error, "Invalid target register code: %02x with lsb %d (reg_idx: %01x)", opCode, lsb, reg_idx);
             Log::error(this->_cpu, error);
             throw std::runtime_error(error);
     }
