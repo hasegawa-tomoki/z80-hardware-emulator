@@ -14,6 +14,22 @@ void Log::write(Cpu* cpu, char* string){
 #endif //Z80EMU_ENABLE_LOG
 }
 
+void Log::dump_registers(Cpu *cpu) {
+    char buffer[400];
+    snprintf(buffer, sizeof(buffer), "step:registers\taf:%04x bc:%04x de:%04x hl:%04x i:%02x r:%02x ix:%02x iy:%04x sp:%04x pc:%04x",
+             cpu->_registers.af(),
+             cpu->_registers.bc(),
+             cpu->_registers.de(),
+             cpu->_registers.hl(),
+             cpu->_special_registers.i,
+             cpu->_special_registers.r,
+             cpu->_special_registers.ix,
+             cpu->_special_registers.iy,
+             cpu->_special_registers.sp,
+             cpu->_special_registers.pc);
+    write(cpu, buffer);
+}
+
 void Log::execute(Cpu* cpu, uint8_t op_code, const char* mnemonic){
     char buffer[400];
     snprintf(buffer, sizeof(buffer), "step:execute\tpc:%04x\topcode:%02x\tmnemonic:%s", cpu->_special_registers.pc - 1, op_code, mnemonic);

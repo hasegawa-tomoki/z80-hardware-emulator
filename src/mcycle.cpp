@@ -1,7 +1,9 @@
 #include <cstdint>
+#include <cstdio>
 #include "mcycle.hpp"
 #include "cpu.hpp"
 #include "log.hpp"
+#include <unistd.h>
 
 void Mcycle::int_m1t1t2(Cpu* cpu){
     // t1
@@ -20,7 +22,7 @@ void Mcycle::int_m1t1t2(Cpu* cpu){
     // tw
     cpu->waitClockRising();
     cpu->waitClockFalling();
-    while (! cpu->pin_i_wait){
+    while (! cpu->readGpio(Cpu::Z80_GPIO_WAIT)){
         cpu->waitClockFalling();
     }
 }
@@ -47,7 +49,7 @@ void Mcycle::m1t2(Cpu* cpu){
         return;
     }
     cpu->waitClockFalling();
-    while (! cpu->pin_i_wait){
+    while (! cpu->readGpio(Cpu::Z80_GPIO_WAIT)){
         cpu->waitClockFalling();
     }
 }
@@ -97,34 +99,48 @@ void Mcycle::m1t4(Cpu* cpu) {
     }
 }
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "Simplify"
 uint8_t Mcycle::m2(Cpu* cpu, uint16_t addr){
+    if (0 < sizeof cpu->virtual_memory && sizeof cpu->virtual_memory <= addr){ // NOLINT(bugprone-sizeof-expression)
+        return cpu->virtual_memory[addr];
+    }
+
     // T1
     cpu->waitClockRising();
     cpu->_bus.setAddress(addr);
-    cpu->waitClockFalling();
     cpu->pin_o_mreq = false;
     cpu->pin_o_rd = false;
     cpu->updateControlSignals();
+    cpu->waitClockFalling();
     // T2
     cpu->waitClockRising();
     cpu->waitClockFalling();
-    while (!cpu->pin_i_wait){
+    while (! cpu->readGpio(Cpu::Z80_GPIO_WAIT)){
         cpu->waitClockFalling();
     }
     // T3
     cpu->waitClockRising();
     uint8_t data = cpu->_bus.read();
-    cpu->waitClockFalling();
     cpu->pin_o_mreq = true;
     cpu->pin_o_rd = true;
     cpu->updateControlSignals();
+    cpu->waitClockFalling();
 
     Log::mem_read(cpu, addr, data);
 
     return data;
 }
+#pragma clang diagnostic pop
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "Simplify"
 void Mcycle::m3(Cpu* cpu, uint16_t addr, uint8_t data){
+    if (0 < sizeof cpu->virtual_memory && sizeof cpu->virtual_memory <= addr){ // NOLINT(bugprone-sizeof-expression)
+        cpu->virtual_memory[addr] = data;
+        return;
+    }
+
     // T1
     cpu->waitClockRising();
     cpu->_bus.setAddress(addr);
@@ -134,10 +150,10 @@ void Mcycle::m3(Cpu* cpu, uint16_t addr, uint8_t data){
     cpu->_bus.write(data);
     // T2
     cpu->waitClockRising();
-    cpu->pin_o_wr = true;
-    cpu->updateControlSignals();
     cpu->waitClockFalling();
-    while (!cpu->pin_i_wait){
+    cpu->pin_o_wr = false;
+    cpu->updateControlSignals();
+    while (! cpu->readGpio(Cpu::Z80_GPIO_WAIT)){
         cpu->waitClockFalling();
     }
     // T3
@@ -148,7 +164,18 @@ void Mcycle::m3(Cpu* cpu, uint16_t addr, uint8_t data){
     cpu->updateControlSignals();
 
     Log::mem_write(cpu, addr, data);
+    /*
+    uint8_t read = Mcycle::m2(cpu, addr);
+    if (data != read){
+        printf("Memory write failed. write: %02x  read: %02x\n", data, read);
+    }
+    uint8_t read2 = Mcycle::m2(cpu, addr);
+    if (read != read2){
+        printf("Memory read unstable. read1: %02x  read2: %02x\n", read, read2);
+    }
+     */
 }
+#pragma clang diagnostic pop
 
 uint8_t Mcycle::in(Cpu* cpu, uint8_t portL, uint8_t portH){
     // T1
@@ -165,7 +192,7 @@ uint8_t Mcycle::in(Cpu* cpu, uint8_t portL, uint8_t portH){
     // TW
     cpu->waitClockRising();
     cpu->waitClockFalling();
-    while (! cpu->pin_i_wait){
+    while (! cpu->readGpio(Cpu::Z80_GPIO_WAIT)){
         cpu->waitClockFalling();
     }
     // T3
@@ -196,7 +223,7 @@ void Mcycle::out(Cpu* cpu, uint8_t portL, uint8_t portH, uint8_t data){
     // TW
     cpu->waitClockRising();
     cpu->waitClockFalling();
-    while (! cpu->pin_i_wait){
+    while (! cpu->readGpio(Cpu::Z80_GPIO_WAIT)){
         cpu->waitClockFalling();
     }
     // T3

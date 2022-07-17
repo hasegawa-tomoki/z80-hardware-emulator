@@ -40,19 +40,25 @@ int main(){
     z80._io.write_gpio(1, 0x0000);
 
     while (true){
-        z80._io.write_gpio(0, 0xffff);
+        cpu._io.write_gpio(1, 0xffff);
         usleep(200 * 1000);
-        z80._io.write_gpio(0, 0x0000);
+        cpu._io.write_gpio(1, 0x0000);
         usleep(200 * 1000);
     }
-     */
-    /*
+
     while(true){
         //uint8_t data = z80._io.read_gpio8(0, Mcp23s17::MCP23S17_GPIOA);
         z80._io.set_direction_8(Z80::IO_CONTROL_DATA_BUS, Z80::GPIO_DATA_BUS, Mcp23s17::DIR_INPUT);
         uint8_t data =  z80._io.read_gpio8(Z80::IO_CONTROL_DATA_BUS, Z80::GPIO_DATA_BUS);
         printf("%02x\n", data);
     }
+    for (uint8_t i = 0; i <= 0xff; i++){
+        cpu._bus.write(i);
+        usleep(20 * 1000);
+        cpu._bus.write(0);
+        usleep(20 * 1000);
+    }
+    return 0;
      */
 
     cpu.instructionCycle();

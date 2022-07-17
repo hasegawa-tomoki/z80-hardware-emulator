@@ -43,11 +43,13 @@ bool Cpu::init()
         printf("Error callback_ex() for Z80_GPIO_RESET");
         return false;
     }
+    /*
     int idWait = callback_ex(this->_pi, Z80_GPIO_WAIT, EITHER_EDGE, Cpu::intWait, this);
     if (idWait < 0){
         printf("Error callback_ex() for Z80_GPIO_WAIT");
         return false;
     }
+     */
     int idNmi = callback_ex(this->_pi, Z80_GPIO_NMI, EITHER_EDGE, Cpu::intNmi, this);
     if (idNmi < 0){
         printf("Error callback_ex() for Z80_GPIO_NMI");
@@ -152,7 +154,7 @@ void Cpu::intClock(int pi, unsigned gpio, unsigned level, uint32_t tick, void *c
 }
 #pragma clang diagnostic pop
 */
-
+/*
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnusedParameter"
 void Cpu::intWait(int pi, unsigned gpio, unsigned level, uint32_t tick, void *cpuObj){
@@ -160,6 +162,7 @@ void Cpu::intWait(int pi, unsigned gpio, unsigned level, uint32_t tick, void *cp
     cpu->pin_i_wait = level;
 }
 #pragma clang diagnostic pop
+*/
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnusedParameter"

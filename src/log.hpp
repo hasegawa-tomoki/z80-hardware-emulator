@@ -9,6 +9,7 @@ class Mcycle;
 class Log {
 public:
     static void write(Cpu* cpu, char* string);
+    static void dump_registers(Cpu *cpu);
     static void execute(Cpu* cpu, uint8_t op_code, const char* mnemonic);
     static void step(Cpu* cpu, const char* step);
     static void target_register(Cpu* cpu, const char* reg_name);

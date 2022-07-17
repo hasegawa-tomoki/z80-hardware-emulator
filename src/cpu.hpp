@@ -18,6 +18,14 @@ public:
     Registers _registers;
     Registers _registers_alternate;
 
+    uint8_t virtual_memory[0] = {};
+    /*
+    uint8_t virtual_memory[32] = {
+            0x00, 0x00, 0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
+    };
+     */
+
     uint32_t tick = 0;
 
     bool iff1 = false;
@@ -84,7 +92,7 @@ public:
     //bool clockFalling();
     void waitClockRising() const;
     void waitClockFalling() const;
-    bool readGpio(uint8_t gpio) const;
+    [[nodiscard]] bool readGpio(uint8_t gpio) const;
     bool nmiFalling();
     bool intFalling();
 
