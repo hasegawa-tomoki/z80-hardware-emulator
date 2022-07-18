@@ -1070,6 +1070,11 @@ void OpCode::execute(uint8_t opCode){
             this->_cpu->_special_registers.pc++;
             break;
         }
+        default:
+            char error[100];
+            sprintf(error, "Invalid op code: %02x", opCode);
+            Log::error(this->_cpu, error);
+            throw std::runtime_error(error);
     }
 }
 
