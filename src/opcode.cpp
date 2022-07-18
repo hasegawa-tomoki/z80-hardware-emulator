@@ -51,7 +51,6 @@ void OpCode::execute(uint8_t opCode){
         case 0x2C:
         case 0x3C: {
             Log::execute(this->_cpu, opCode, "inc r");
-            //uint8_t* reg = this->targetRegisterB(-2, opCode);
             uint8_t *reg = this->targetRegister(opCode, 3);
             this->setFlagsByIncrement(*reg);
             (*reg)++;
@@ -65,7 +64,6 @@ void OpCode::execute(uint8_t opCode){
         case 0x2D:
         case 0x3D: {
             Log::execute(this->_cpu, opCode, "dec r");
-            //uint8_t* reg = this->targetRegisterB(-1, opCode);
             uint8_t *reg = this->targetRegister(opCode, 3);
             this->setFlagsByDecrement(*reg);
             (*reg)--;
@@ -79,7 +77,6 @@ void OpCode::execute(uint8_t opCode){
         case 0x2e:
         case 0x3e: {
             Log::execute(this->_cpu, opCode, "ld r, n");
-            //uint8_t* reg = this->targetRegisterB(0, opCode);
             uint8_t* reg = this->targetRegister(opCode, 3);
             *reg = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
             this->_cpu->_special_registers.pc++;
