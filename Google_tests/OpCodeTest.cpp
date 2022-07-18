@@ -117,7 +117,7 @@ TEST_F(OpCodeTest, Test_LD_bc_A) {
 // 0x13: inc de
 // 0x23: inc hl
 // 0x33: inc sp
-TEST_F(OpCodeTest, Test_INC_BC) {
+TEST_F(OpCodeTest, Test_INC_RR) {
     // 0x03: inc bc
     cpu->_registers.FZ_Zero = false;
     cpu->_registers.FC_Carry = false;
@@ -163,7 +163,189 @@ TEST_F(OpCodeTest, Test_INC_BC) {
     EXPECT_EQ(cpu->_registers.FC_Carry, false);
 }
 
+// 0x04: inc b
+// 0x0C: inc c
+// 0x14: inc d
+// 0x1C: inc e
+// 0x24: inc h
+// 0x2C: inc l
+// 0x3C: inc a
+TEST_F(OpCodeTest, Test_INC_R) {
+    // 0x04: inc b
+    cpu->_registers.FS_Sign = true;
+    cpu->_registers.FZ_Zero = false;
+    cpu->_registers.FH_HalfCarry = false;
+    cpu->_registers.FPV_ParityOverflow = true;
+    cpu->_registers.FN_Subtract = true;
+    cpu->_registers.FC_Carry = false;
 
+    cpu->_registers.b = 0xff;
+    cpu->_opCode.execute(0x04);
+    EXPECT_EQ(cpu->_registers.b, 0x00);
+
+    EXPECT_EQ(cpu->_registers.FS_Sign, false);
+    EXPECT_EQ(cpu->_registers.FZ_Zero, true);
+    EXPECT_EQ(cpu->_registers.FH_HalfCarry, true);
+    EXPECT_EQ(cpu->_registers.FPV_ParityOverflow, false);
+    EXPECT_EQ(cpu->_registers.FN_Subtract, false);
+    EXPECT_EQ(cpu->_registers.FC_Carry, false);
+
+    cpu->_registers.FPV_ParityOverflow = false;
+    cpu->_registers.b = 0x7f;
+    cpu->_opCode.execute(0x04);
+    EXPECT_EQ(cpu->_registers.b, 0x80);
+    EXPECT_EQ(cpu->_registers.FPV_ParityOverflow, true);
+
+    // 0x0C: inc c
+    cpu->_registers.FS_Sign = true;
+    cpu->_registers.FZ_Zero = false;
+    cpu->_registers.FH_HalfCarry = false;
+    cpu->_registers.FPV_ParityOverflow = true;
+    cpu->_registers.FN_Subtract = true;
+    cpu->_registers.FC_Carry = false;
+
+    cpu->_registers.c = 0xff;
+    cpu->_opCode.execute(0x0c);
+    EXPECT_EQ(cpu->_registers.c, 0x00);
+
+    EXPECT_EQ(cpu->_registers.FS_Sign, false);
+    EXPECT_EQ(cpu->_registers.FZ_Zero, true);
+    EXPECT_EQ(cpu->_registers.FH_HalfCarry, true);
+    EXPECT_EQ(cpu->_registers.FPV_ParityOverflow, false);
+    EXPECT_EQ(cpu->_registers.FN_Subtract, false);
+    EXPECT_EQ(cpu->_registers.FC_Carry, false);
+
+    cpu->_registers.FPV_ParityOverflow = false;
+    cpu->_registers.c = 0x7f;
+    cpu->_opCode.execute(0x0c);
+    EXPECT_EQ(cpu->_registers.c, 0x80);
+    EXPECT_EQ(cpu->_registers.FPV_ParityOverflow, true);
+
+    // 0x14: inc d
+    cpu->_registers.FS_Sign = true;
+    cpu->_registers.FZ_Zero = false;
+    cpu->_registers.FH_HalfCarry = false;
+    cpu->_registers.FPV_ParityOverflow = true;
+    cpu->_registers.FN_Subtract = true;
+    cpu->_registers.FC_Carry = false;
+
+    cpu->_registers.d = 0xff;
+    cpu->_opCode.execute(0x14);
+    EXPECT_EQ(cpu->_registers.d, 0x00);
+
+    EXPECT_EQ(cpu->_registers.FS_Sign, false);
+    EXPECT_EQ(cpu->_registers.FZ_Zero, true);
+    EXPECT_EQ(cpu->_registers.FH_HalfCarry, true);
+    EXPECT_EQ(cpu->_registers.FPV_ParityOverflow, false);
+    EXPECT_EQ(cpu->_registers.FN_Subtract, false);
+    EXPECT_EQ(cpu->_registers.FC_Carry, false);
+
+    cpu->_registers.FPV_ParityOverflow = false;
+    cpu->_registers.d = 0x7f;
+    cpu->_opCode.execute(0x14);
+    EXPECT_EQ(cpu->_registers.d, 0x80);
+    EXPECT_EQ(cpu->_registers.FPV_ParityOverflow, true);
+
+    // 0x1C: inc e
+    cpu->_registers.FS_Sign = true;
+    cpu->_registers.FZ_Zero = false;
+    cpu->_registers.FH_HalfCarry = false;
+    cpu->_registers.FPV_ParityOverflow = true;
+    cpu->_registers.FN_Subtract = true;
+    cpu->_registers.FC_Carry = false;
+
+    cpu->_registers.e = 0xff;
+    cpu->_opCode.execute(0x1c);
+    EXPECT_EQ(cpu->_registers.e, 0x00);
+
+    EXPECT_EQ(cpu->_registers.FS_Sign, false);
+    EXPECT_EQ(cpu->_registers.FZ_Zero, true);
+    EXPECT_EQ(cpu->_registers.FH_HalfCarry, true);
+    EXPECT_EQ(cpu->_registers.FPV_ParityOverflow, false);
+    EXPECT_EQ(cpu->_registers.FN_Subtract, false);
+    EXPECT_EQ(cpu->_registers.FC_Carry, false);
+
+    cpu->_registers.FPV_ParityOverflow = false;
+    cpu->_registers.e = 0x7f;
+    cpu->_opCode.execute(0x1c);
+    EXPECT_EQ(cpu->_registers.e, 0x80);
+    EXPECT_EQ(cpu->_registers.FPV_ParityOverflow, true);
+
+    // 0x24: inc h
+    cpu->_registers.FS_Sign = true;
+    cpu->_registers.FZ_Zero = false;
+    cpu->_registers.FH_HalfCarry = false;
+    cpu->_registers.FPV_ParityOverflow = true;
+    cpu->_registers.FN_Subtract = true;
+    cpu->_registers.FC_Carry = false;
+
+    cpu->_registers.h = 0xff;
+    cpu->_opCode.execute(0x24);
+    EXPECT_EQ(cpu->_registers.h, 0x00);
+
+    EXPECT_EQ(cpu->_registers.FS_Sign, false);
+    EXPECT_EQ(cpu->_registers.FZ_Zero, true);
+    EXPECT_EQ(cpu->_registers.FH_HalfCarry, true);
+    EXPECT_EQ(cpu->_registers.FPV_ParityOverflow, false);
+    EXPECT_EQ(cpu->_registers.FN_Subtract, false);
+    EXPECT_EQ(cpu->_registers.FC_Carry, false);
+
+    cpu->_registers.FPV_ParityOverflow = false;
+    cpu->_registers.h = 0x7f;
+    cpu->_opCode.execute(0x24);
+    EXPECT_EQ(cpu->_registers.h, 0x80);
+    EXPECT_EQ(cpu->_registers.FPV_ParityOverflow, true);
+
+    // 0x2C: inc l
+    cpu->_registers.FS_Sign = true;
+    cpu->_registers.FZ_Zero = false;
+    cpu->_registers.FH_HalfCarry = false;
+    cpu->_registers.FPV_ParityOverflow = true;
+    cpu->_registers.FN_Subtract = true;
+    cpu->_registers.FC_Carry = false;
+
+    cpu->_registers.l = 0xff;
+    cpu->_opCode.execute(0x2c);
+    EXPECT_EQ(cpu->_registers.l, 0x00);
+
+    EXPECT_EQ(cpu->_registers.FS_Sign, false);
+    EXPECT_EQ(cpu->_registers.FZ_Zero, true);
+    EXPECT_EQ(cpu->_registers.FH_HalfCarry, true);
+    EXPECT_EQ(cpu->_registers.FPV_ParityOverflow, false);
+    EXPECT_EQ(cpu->_registers.FN_Subtract, false);
+    EXPECT_EQ(cpu->_registers.FC_Carry, false);
+
+    cpu->_registers.FPV_ParityOverflow = false;
+    cpu->_registers.l = 0x7f;
+    cpu->_opCode.execute(0x2c);
+    EXPECT_EQ(cpu->_registers.l, 0x80);
+    EXPECT_EQ(cpu->_registers.FPV_ParityOverflow, true);
+
+    // 0x3C: inc a
+    cpu->_registers.FS_Sign = true;
+    cpu->_registers.FZ_Zero = false;
+    cpu->_registers.FH_HalfCarry = false;
+    cpu->_registers.FPV_ParityOverflow = true;
+    cpu->_registers.FN_Subtract = true;
+    cpu->_registers.FC_Carry = false;
+
+    cpu->_registers.a = 0xff;
+    cpu->_opCode.execute(0x3c);
+    EXPECT_EQ(cpu->_registers.a, 0x00);
+
+    EXPECT_EQ(cpu->_registers.FS_Sign, false);
+    EXPECT_EQ(cpu->_registers.FZ_Zero, true);
+    EXPECT_EQ(cpu->_registers.FH_HalfCarry, true);
+    EXPECT_EQ(cpu->_registers.FPV_ParityOverflow, false);
+    EXPECT_EQ(cpu->_registers.FN_Subtract, false);
+    EXPECT_EQ(cpu->_registers.FC_Carry, false);
+
+    cpu->_registers.FPV_ParityOverflow = false;
+    cpu->_registers.a = 0x7f;
+    cpu->_opCode.execute(0x3c);
+    EXPECT_EQ(cpu->_registers.a, 0x80);
+    EXPECT_EQ(cpu->_registers.FPV_ParityOverflow, true);
+}
 
 
 /*
