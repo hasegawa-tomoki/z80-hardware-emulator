@@ -1,6 +1,6 @@
 #ifndef MCP23S17_HPP
 #define MCP23S17_HPP
-#include "pigpio.h"
+#include <pigpiod_if2.h>
 
 class Mcp23s17 {
 public:
