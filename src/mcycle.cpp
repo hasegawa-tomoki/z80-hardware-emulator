@@ -102,7 +102,7 @@ void Mcycle::m1t4(Cpu* cpu) {
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "Simplify"
 uint8_t Mcycle::m2(Cpu* cpu, uint16_t addr){
-    if (0 < sizeof cpu->virtual_memory && sizeof cpu->virtual_memory <= addr){ // NOLINT(bugprone-sizeof-expression)
+    if (cpu->enable_virtual_memory){
         return cpu->virtual_memory[addr];
     }
 
@@ -136,7 +136,7 @@ uint8_t Mcycle::m2(Cpu* cpu, uint16_t addr){
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "Simplify"
 void Mcycle::m3(Cpu* cpu, uint16_t addr, uint8_t data){
-    if (0 < sizeof cpu->virtual_memory && sizeof cpu->virtual_memory <= addr){ // NOLINT(bugprone-sizeof-expression)
+    if (cpu->enable_virtual_memory){
         cpu->virtual_memory[addr] = data;
         return;
     }
