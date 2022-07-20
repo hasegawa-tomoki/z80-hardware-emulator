@@ -21,8 +21,12 @@ public:
     bool FN_Subtract = false;
     // P/V: Parity/Overflow Flag
     bool FPV_ParityOverflow = false;
+    // X: bit3
+    bool F_bit3 = false;
     // H: Half Carry Flag
     bool FH_HalfCarry = false;
+    // X: bit5
+    bool F_bit5 = false;
     // Z: Zero Flag
     bool FZ_Zero = false;
     // S: Sign Flag

@@ -33,33 +33,25 @@ uint16_t Registers::hl() const{
 }
 
 void Registers::f(uint8_t value){
-    this->FC_Carry = ((value & 0x00000001) > 0);
-    this->FN_Subtract = ((value & 0x00000010) > 0);
-    this->FPV_ParityOverflow = ((value & 0x00000100) > 0);
-    this->FH_HalfCarry = ((value & 0x00010000) > 0);
-    this->FZ_Zero = ((value & 0x01000000) > 0);
-    this->FS_Sign = ((value & 0x10000000) > 0);
+    this->FC_Carry =            ((value & 0x00000001) > 0);
+    this->FN_Subtract =         ((value & 0x00000010) > 0);
+    this->FPV_ParityOverflow =  ((value & 0x00000100) > 0);
+    this->F_bit3 =              ((value & 0x00001000) > 0);
+    this->FH_HalfCarry =        ((value & 0x00010000) > 0);
+    this->F_bit5 =              ((value & 0x00100000) > 0);
+    this->FZ_Zero =             ((value & 0x01000000) > 0);
+    this->FS_Sign =             ((value & 0x10000000) > 0);
 }
 uint8_t Registers::f() const {
     uint8_t value = 0;
-    if (this->FC_Carry){
-        value |= 0x00000001;
-    }
-    if (this->FN_Subtract){
-        value |= 0x00000010;
-    }
-    if (this->FPV_ParityOverflow){
-        value |= 0x00000100;
-    }
-    if (this->FH_HalfCarry){
-        value |= 0x00010000;
-    }
-    if (this->FZ_Zero){
-        value |= 0x01000000;
-    }
-    if (this->FS_Sign){
-        value |= 0x10000000;
-    }
+    if (this->FC_Carry){            value |= 0x00000001; }
+    if (this->FN_Subtract){         value |= 0x00000010; }
+    if (this->FPV_ParityOverflow){  value |= 0x00000100; }
+    if (this->F_bit3){              value |= 0x00001000; }
+    if (this->FH_HalfCarry){        value |= 0x00010000; }
+    if (this->F_bit5){              value |= 0x00100000; }
+    if (this->FZ_Zero){             value |= 0x01000000; }
+    if (this->FS_Sign){             value |= 0x10000000; }
     return value;
 }
 
