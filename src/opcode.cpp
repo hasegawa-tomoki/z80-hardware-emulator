@@ -131,8 +131,14 @@ void OpCode::execute(uint8_t opCode){
         }
         case 0x10: { // djnz n
             Log::execute(this->_cpu, opCode, "djnz n");
-            auto diff = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
-            this->_cpu->_special_registers.pc += diff;
+            this->_cpu->_registers.b--;
+            if (this->_cpu->_registers.b != 0){
+                auto diff = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
+                this->_cpu->_special_registers.pc++;
+                this->_cpu->_special_registers.pc += diff;
+            } else {
+                this->_cpu->_special_registers.pc++;
+            }
             break;
         }
         case 0x11: // ld de, nn
