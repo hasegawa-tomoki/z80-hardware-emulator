@@ -908,7 +908,7 @@ void OpCode::execute(uint8_t opCode){
             break;
         case 0xEA: // jp pe, nn
             Log::execute(this->_cpu, opCode, "jp pe, nn");
-            if (!this->_cpu->_registers.FPV_ParityOverflow) {
+            if (this->_cpu->_registers.FPV_ParityOverflow) {
                 this->_cpu->_special_registers.pc =
                         Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc) +
                         (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8);
@@ -954,7 +954,7 @@ void OpCode::execute(uint8_t opCode){
             break;
         case 0xF0: // ret p
             Log::execute(this->_cpu, opCode, "ret p");
-            if (! this->_cpu->_registers.FN_Subtract){
+            if (! this->_cpu->_registers.FS_Sign){
                 this->_cpu->_special_registers.pc =
                         Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp) +
                         (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp + 1) << 8);
@@ -969,7 +969,7 @@ void OpCode::execute(uint8_t opCode){
             break;
         case 0xF2: // jp p, nn
             Log::execute(this->_cpu, opCode, "jp p, nn");
-            if (! this->_cpu->_registers.FN_Subtract){
+            if (! this->_cpu->_registers.FS_Sign){
                 this->_cpu->_special_registers.pc =
                         Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc) +
                         (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8);
@@ -983,7 +983,7 @@ void OpCode::execute(uint8_t opCode){
             break;
         case 0xF4: // call p, nn
             Log::execute(this->_cpu, opCode, "call p, nn");
-            if (! this->_cpu->_registers.FN_Subtract) {
+            if (! this->_cpu->_registers.FS_Sign) {
                 uint16_t jump_addr =
                         Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc) +
                         (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8);
