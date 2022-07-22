@@ -17,7 +17,7 @@ void Log::write(Cpu* cpu, char* string){
 void Log::dump_registers(Cpu *cpu) {
     char buffer[400];
     snprintf(buffer, sizeof(buffer),
-             "type:registers\taf:%04x bc:%04x de:%04x hl:%04x i:%02x r:%02x ix:%02x iy:%04x sp:%04x pc:%04x / FC:%s FN:%s FP/V:%s FH:%s FZ:%s FS:%s",
+             "type:registers\taf:%04x bc:%04x de:%04x hl:%04x i:%02x r:%02x ix:%04x iy:%04x sp:%04x pc:%04x / FC:%s FN:%s FP/V:%s FH:%s FZ:%s FS:%s",
              cpu->_registers.af(),
              cpu->_registers.bc(),
              cpu->_registers.de(),
