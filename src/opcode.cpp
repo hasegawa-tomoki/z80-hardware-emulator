@@ -345,6 +345,7 @@ void OpCode::execute(uint8_t opCode){
                     (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8);
             this->_cpu->_special_registers.pc += 2;
             this->_cpu->_registers.a = Mcycle::m2(this->_cpu, addr);
+            Log::dump_registers(this->_cpu);
             break;
         }
         case 0x3B: // dec sp
