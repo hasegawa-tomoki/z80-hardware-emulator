@@ -34,6 +34,9 @@ void Mcycle::m1t1(Cpu* cpu){
         return;
     }
     cpu->_bus.setAddress(cpu->_special_registers.pc);
+    if (cpu->enable_virtual_memory){
+        cpu->executing = cpu->virtual_memory[cpu->_special_registers.pc];
+    }
     cpu->_special_registers.pc++;
     cpu->pin_o_mreq = false;
     cpu->pin_o_rd = false;
@@ -58,7 +61,10 @@ void Mcycle::m1t3(Cpu* cpu) {
     // T3-rising: Fetch data. Output refresh address. Update control signals
     cpu->waitClockRising();
     if (! cpu->halt){
-        cpu->executing = cpu->_bus.read();
+        if (! cpu->enable_virtual_memory){
+            cpu->executing = cpu->_bus.read();
+        }
+
         cpu->pin_o_mreq = true;
         cpu->pin_o_rd = true;
         cpu->pin_o_m1 = true;
@@ -103,6 +109,7 @@ void Mcycle::m1t4(Cpu* cpu) {
 #pragma ide diagnostic ignored "Simplify"
 uint8_t Mcycle::m2(Cpu* cpu, uint16_t addr){
     if (cpu->enable_virtual_memory){
+        Log::mem_read(cpu, addr, cpu->virtual_memory[addr]);
         return cpu->virtual_memory[addr];
     }
 
@@ -138,6 +145,7 @@ uint8_t Mcycle::m2(Cpu* cpu, uint16_t addr){
 void Mcycle::m3(Cpu* cpu, uint16_t addr, uint8_t data){
     if (cpu->enable_virtual_memory){
         cpu->virtual_memory[addr] = data;
+        Log::mem_write(cpu, addr, data);
         return;
     }
 
