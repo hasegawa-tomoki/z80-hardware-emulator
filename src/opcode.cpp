@@ -1513,9 +1513,7 @@ void OpCode::executeDd(uint8_t opCode){
             break;
         case 0xE9: // jp (ix)
             Log::execute(this->_cpu, opCode, "jp (ix)");
-            this->_cpu->_special_registers.pc =
-                    Mcycle::m2(this->_cpu, this->_cpu->_special_registers.ix) +
-                    (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.ix + 1) << 8);
+            this->_cpu->_special_registers.pc = this->_cpu->_special_registers.ix;
             break;
         case 0xF9: // ld sp, ix
             Log::execute(this->_cpu, opCode, "ld sp, ix");
@@ -2212,9 +2210,7 @@ void OpCode::executeFd(uint8_t opCode){
             break;
         case 0xE9: // jp (iy)
             Log::execute(this->_cpu, opCode, "jp (iy)");
-            this->_cpu->_special_registers.pc =
-                    Mcycle::m2(this->_cpu, this->_cpu->_special_registers.iy) +
-                    (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.iy + 1) << 8);
+            this->_cpu->_special_registers.pc = this->_cpu->_special_registers.iy;
             break;
         case 0xF9: // ld sp, iy
             Log::execute(this->_cpu, opCode, "ld sp, iy");
