@@ -961,17 +961,12 @@ void OpCode::execute(uint8_t opCode){
                 this->_cpu->_special_registers.sp += 2;
             }
             break;
-        case 0xF1: { // pop af
+        case 0xF1: // pop af
             Log::execute(this->_cpu, opCode, "pop af");
-            uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp);
-            this->_cpu->_registers.FZ_Zero = ((value & 0x80) == 0x80);
-            this->_cpu->_registers.FN_Subtract = ((value & 0x40) == 0x40);
-            this->_cpu->_registers.FH_HalfCarry = ((value & 0x20) == 0x20);
-            this->_cpu->_registers.FC_Carry = ((value & 0x10) == 0x10);
+            this->_cpu->_registers.f(Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp));
             this->_cpu->_registers.a = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp + 1);
             this->_cpu->_special_registers.sp += 2;
             break;
-        }
         case 0xF2: // jp p, nn
             Log::execute(this->_cpu, opCode, "jp p, nn");
             if (! this->_cpu->_registers.FN_Subtract){
