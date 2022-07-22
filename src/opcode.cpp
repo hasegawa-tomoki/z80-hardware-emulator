@@ -124,7 +124,9 @@ void OpCode::execute(uint8_t opCode){
             Log::execute(this->_cpu, opCode, "rrca");
             bool carry_bit = ((this->_cpu->_registers.a & 1) > 0);
             this->_cpu->_registers.a = (this->_cpu->_registers.a >> 1) + ((this->_cpu->_registers.a & 1) << 7);
-            this->setFlagsByRotate(this->_cpu->_registers.a, carry_bit);
+            this->_cpu->_registers.FH_HalfCarry = false;
+            this->_cpu->_registers.FN_Subtract = false;
+            this->_cpu->_registers.FC_Carry = carry_bit;
             break;
         }
         case 0x10: { // djnz n
