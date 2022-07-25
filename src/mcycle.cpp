@@ -175,16 +175,6 @@ void Mcycle::m3(Cpu* cpu, uint16_t addr, uint8_t data){
     cpu->updateControlSignals();
 
     Log::mem_write(cpu, addr, data);
-    /*
-    uint8_t read = Mcycle::m2(cpu, addr);
-    if (data != read){
-        printf("Memory write failed. write: %02x  read: %02x\n", data, read);
-    }
-    uint8_t read2 = Mcycle::m2(cpu, addr);
-    if (read != read2){
-        printf("Memory read unstable. read1: %02x  read2: %02x\n", read, read2);
-    }
-     */
 }
 #pragma clang diagnostic pop
 
