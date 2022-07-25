@@ -33,9 +33,10 @@ void Mcycle::m1t1(Cpu* cpu){
     if (cpu->halt){
         return;
     }
-    cpu->_bus.setAddress(cpu->_special_registers.pc);
     if (cpu->enable_virtual_memory){
         cpu->executing = cpu->virtual_memory[cpu->_special_registers.pc];
+    } else {
+        cpu->_bus.setAddress(cpu->_special_registers.pc);
     }
     cpu->_special_registers.pc++;
     cpu->pin_o_mreq = false;
@@ -75,7 +76,9 @@ void Mcycle::m1t3(Cpu* cpu) {
     }
     auto refreshAddr = (uint16_t)((cpu->_special_registers.i << 8) | cpu->_special_registers.r);
     //printf("Refresh addr: %04x\n", refreshAddr);
-    cpu->_bus.setAddress(refreshAddr);
+    if (! cpu->enable_virtual_memory) {
+        cpu->_bus.setAddress(refreshAddr);
+    }
     // T3-falling: Activate MREQ
     cpu->waitClockFalling();
     cpu->pin_o_mreq = false;
