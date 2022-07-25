@@ -2332,5 +2332,3 @@ void OpCode::setFlagsByRotate(uint8_t n, bool carry) const {
     this->_cpu->_registers.FZ_Zero = (0 == n);
     this->_cpu->_registers.FPV_ParityOverflow = (this->count1(n) % 2 == 0);
 }
-
-
