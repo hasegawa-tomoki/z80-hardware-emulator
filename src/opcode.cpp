@@ -589,15 +589,7 @@ void OpCode::execute(uint8_t opCode){
         case 0xC4: // call nz, nn
             Log::execute(this->_cpu, opCode, "call nz, nn");
             if (!this->_cpu->_registers.FZ_Zero) {
-                uint16_t jump_addr =
-                        Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc) +
-                        (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8);
-                this->_cpu->_special_registers.pc += 2;
-                this->_cpu->_special_registers.sp--;
-                Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc >> 8);
-                this->_cpu->_special_registers.sp--;
-                Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc & 0xff);
-                this->_cpu->_special_registers.pc = jump_addr;
+                this->executeCall();
             } else {
                 this->_cpu->_special_registers.pc += 2;
             }
@@ -668,30 +660,14 @@ void OpCode::execute(uint8_t opCode){
         case 0xCC: // call z, nn
             Log::execute(this->_cpu, opCode, "call z, nn");
             if (this->_cpu->_registers.FZ_Zero) {
-                uint16_t jump_addr =
-                        Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc) +
-                        (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8);
-                this->_cpu->_special_registers.pc += 2;
-                this->_cpu->_special_registers.sp--;
-                Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc >> 8);
-                this->_cpu->_special_registers.sp--;
-                Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc & 0xff);
-                this->_cpu->_special_registers.pc = jump_addr;
+                this->executeCall();
             } else {
                 this->_cpu->_special_registers.pc += 2;
             }
             break;
         case 0xCD: { // call nn
             Log::execute(this->_cpu, opCode, "call nn");
-            uint16_t jump_addr =
-                    Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc) +
-                    (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8);
-            this->_cpu->_special_registers.pc += 2;
-            this->_cpu->_special_registers.sp--;
-            Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc >> 8);
-            this->_cpu->_special_registers.sp--;
-            Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc & 0xff);
-            this->_cpu->_special_registers.pc = jump_addr;
+            this->executeCall();
             break;
         }
         case 0xCE: { // adc a, n
@@ -738,15 +714,7 @@ void OpCode::execute(uint8_t opCode){
         case 0xD4: // call nc, nn
             Log::execute(this->_cpu, opCode, "call nc, nn");
             if (!this->_cpu->_registers.FC_Carry) {
-                uint16_t jump_addr =
-                        Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc) +
-                        (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8);
-                this->_cpu->_special_registers.pc += 2;
-                this->_cpu->_special_registers.sp--;
-                Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc >> 8);
-                this->_cpu->_special_registers.sp--;
-                Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc & 0xff);
-                this->_cpu->_special_registers.pc = jump_addr;
+                this->executeCall();
             } else {
                 this->_cpu->_special_registers.pc += 2;
             }
@@ -809,15 +777,7 @@ void OpCode::execute(uint8_t opCode){
         case 0xDC: // call c, nn
             Log::execute(this->_cpu, opCode, "call c, nn");
             if (this->_cpu->_registers.FC_Carry) {
-                uint16_t jump_addr =
-                        Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc) +
-                        (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8);
-                this->_cpu->_special_registers.pc += 2;
-                this->_cpu->_special_registers.sp--;
-                Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc >> 8);
-                this->_cpu->_special_registers.sp--;
-                Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc & 0xff);
-                this->_cpu->_special_registers.pc = jump_addr;
+                this->executeCall();
             } else {
                 this->_cpu->_special_registers.pc += 2;
             }
@@ -879,15 +839,7 @@ void OpCode::execute(uint8_t opCode){
         case 0xE4: // call po, nn
             Log::execute(this->_cpu, opCode, "call po, nn");
             if (! this->_cpu->_registers.FPV_ParityOverflow) {
-                uint16_t jump_addr =
-                        Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc) +
-                        (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8);
-                this->_cpu->_special_registers.pc += 2;
-                this->_cpu->_special_registers.sp--;
-                Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc >> 8);
-                this->_cpu->_special_registers.sp--;
-                Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc & 0xff);
-                this->_cpu->_special_registers.pc = jump_addr;
+                this->executeCall();
             } else {
                 this->_cpu->_special_registers.pc += 2;
             }
@@ -938,15 +890,7 @@ void OpCode::execute(uint8_t opCode){
         case 0xEC: // call pe, nn
             Log::execute(this->_cpu, opCode, "call pe, nn");
             if (this->_cpu->_registers.FPV_ParityOverflow) {
-                uint16_t jump_addr =
-                        Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc) +
-                        (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8);
-                this->_cpu->_special_registers.pc += 2;
-                this->_cpu->_special_registers.sp--;
-                Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc >> 8);
-                this->_cpu->_special_registers.sp--;
-                Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc & 0xff);
-                this->_cpu->_special_registers.pc = jump_addr;
+                this->executeCall();
             } else {
                 this->_cpu->_special_registers.pc += 2;
             }
@@ -996,15 +940,7 @@ void OpCode::execute(uint8_t opCode){
         case 0xF4: // call p, nn
             Log::execute(this->_cpu, opCode, "call p, nn");
             if (! this->_cpu->_registers.FS_Sign) {
-                uint16_t jump_addr =
-                        Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc) +
-                        (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8);
-                this->_cpu->_special_registers.pc += 2;
-                this->_cpu->_special_registers.sp--;
-                Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc >> 8);
-                this->_cpu->_special_registers.sp--;
-                Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc & 0xff);
-                this->_cpu->_special_registers.pc = jump_addr;
+                this->executeCall();
             } else {
                 this->_cpu->_special_registers.pc += 2;
             }
@@ -1052,15 +988,7 @@ void OpCode::execute(uint8_t opCode){
         case 0xFC: // call m, nn
             Log::execute(this->_cpu, opCode, "call m, nn");
             if (this->_cpu->_registers.FS_Sign){
-                uint16_t jump_addr =
-                        Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc) +
-                        (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8);
-                this->_cpu->_special_registers.pc += 2;
-                this->_cpu->_special_registers.sp--;
-                Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc >> 8);
-                this->_cpu->_special_registers.sp--;
-                Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc & 0xff);
-                this->_cpu->_special_registers.pc = jump_addr;
+                this->executeCall();
             } else {
                 this->_cpu->_special_registers.pc += 2;
             }
@@ -2253,6 +2181,46 @@ uint8_t* OpCode::targetRegister(uint8_t opCode, int lsb) const {
             sprintf(error, "Invalid target register code: %02x with lsb %d (reg_idx: %01x)", opCode, lsb, reg_idx);
             Log::error(this->_cpu, error);
             throw std::runtime_error(error);
+    }
+}
+
+void OpCode::executeCall(){
+    uint16_t jump_addr =
+            Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc) +
+            (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8);
+    this->_cpu->_special_registers.pc += 2;
+    if (this->_cpu->emulate_cpm_bdos_call && jump_addr != 0x0005){
+        this->_cpu->_special_registers.sp--;
+        Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc >> 8);
+        this->_cpu->_special_registers.sp--;
+        Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc & 0xff);
+        this->_cpu->_special_registers.pc = jump_addr;
+    } else {
+        // CP/M BDOS system calls
+        Log::dump_registers(this->_cpu);
+        switch (this->_cpu->_registers.c){
+            case 0x02:
+                // Console output
+                printf("CP/M BDOS call 0x02 Console output: %c\n", this->_cpu->_registers.e);
+                break;
+            case 0x09: {
+                // Output string
+                printf("CP/M BDOS call 0x09 Output string: ");
+                uint8_t chr;
+                do {
+                    chr = Mcycle::m2(this->_cpu, this->_cpu->_registers.de());
+                    this->_cpu->_registers.de(this->_cpu->_registers.de() + 1);
+                    if (chr == '$'){
+                        break;
+                    }
+                    printf("%c", chr);
+                } while(true);
+                printf("\n");
+                break;
+            }
+            default:
+                break;
+        }
     }
 }
 
