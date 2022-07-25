@@ -151,6 +151,7 @@ public:
     };
 private:
     [[nodiscard]] uint8_t* targetRegister(uint8_t opCode, int lsb) const;
+    void executeCall();
     static uint8_t count1(uint8_t data);
     void setFlagsByAddition(uint8_t before, uint8_t addition, bool set_carry = true) const;
     void setFlagsBySubtract(uint8_t before, uint8_t subtract, bool set_carry = true) const;
