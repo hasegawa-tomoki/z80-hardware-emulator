@@ -569,6 +569,7 @@ void OpCode::execute(uint8_t opCode){
             this->_cpu->_registers.c = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp);
             this->_cpu->_registers.b = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp + 1);
             this->_cpu->_special_registers.sp += 2;
+            Log::dump_registers(this->_cpu);
             break;
         case 0xC2: // jp nz, nn
             Log::execute(this->_cpu, opCode, "jp nz, nn");
@@ -600,6 +601,7 @@ void OpCode::execute(uint8_t opCode){
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_registers.b);
             this->_cpu->_special_registers.sp--;
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_registers.c);
+            Log::dump_registers(this->_cpu);
             break;
         case 0xC6: { // add a, n
             Log::execute(this->_cpu, opCode, "add a, n");
@@ -693,6 +695,7 @@ void OpCode::execute(uint8_t opCode){
             this->_cpu->_registers.e = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp);
             this->_cpu->_registers.d = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp + 1);
             this->_cpu->_special_registers.sp += 2;
+            Log::dump_registers(this->_cpu);
             break;
         case 0xD2: // jp nc, nn
             Log::execute(this->_cpu, opCode, "jp nc, nn");
@@ -725,6 +728,7 @@ void OpCode::execute(uint8_t opCode){
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_registers.d);
             this->_cpu->_special_registers.sp--;
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_registers.e);
+            Log::dump_registers(this->_cpu);
             break;
         case 0xD6: { // sub n
             Log::execute(this->_cpu, opCode, "sub n");
@@ -814,6 +818,7 @@ void OpCode::execute(uint8_t opCode){
                     (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp + 1) << 8)
             );
             this->_cpu->_special_registers.sp += 2;
+            Log::dump_registers(this->_cpu);
             break;
         case 0xE2: // jp po, nn
             Log::execute(this->_cpu, opCode, "jp po, nn");
@@ -850,6 +855,7 @@ void OpCode::execute(uint8_t opCode){
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_registers.hl() >> 8);
             this->_cpu->_special_registers.sp--;
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_registers.hl() & 0xff);
+            Log::dump_registers(this->_cpu);
             break;
         case 0xE6: // and n
             Log::execute(this->_cpu, opCode, "and n");
@@ -922,6 +928,7 @@ void OpCode::execute(uint8_t opCode){
             this->_cpu->_registers.f(Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp));
             this->_cpu->_registers.a = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp + 1);
             this->_cpu->_special_registers.sp += 2;
+            Log::dump_registers(this->_cpu);
             break;
         case 0xF2: // jp p, nn
             Log::execute(this->_cpu, opCode, "jp p, nn");
@@ -951,6 +958,7 @@ void OpCode::execute(uint8_t opCode){
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_registers.a);
             this->_cpu->_special_registers.sp--;
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_registers.f());
+            Log::dump_registers(this->_cpu);
             break;
         case 0xF6: // or n
             Log::execute(this->_cpu, opCode, "or n");
@@ -1435,6 +1443,7 @@ void OpCode::executeDd(uint8_t opCode){
                     Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp) +
                     (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp + 1) << 8);
             this->_cpu->_special_registers.sp += 2;
+            Log::dump_registers(this->_cpu);
             break;
         case 0xE3: { // ex (sp), ix
             Log::execute(this->_cpu, opCode, "ex (sp), ix");
@@ -1450,6 +1459,7 @@ void OpCode::executeDd(uint8_t opCode){
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.ix >> 8);
             this->_cpu->_special_registers.sp--;
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.ix & 0xff);
+            Log::dump_registers(this->_cpu);
             break;
         case 0xE9: // jp (ix)
             Log::execute(this->_cpu, opCode, "jp (ix)");
@@ -2132,6 +2142,7 @@ void OpCode::executeFd(uint8_t opCode){
                     Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp) +
                     (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.sp + 1) << 8);
             this->_cpu->_special_registers.sp += 2;
+            Log::dump_registers(this->_cpu);
             break;
         case 0xE3: { // ex (sp), iy
             Log::execute(this->_cpu, opCode, "ex (sp), iy");
@@ -2147,6 +2158,7 @@ void OpCode::executeFd(uint8_t opCode){
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.iy >> 8);
             this->_cpu->_special_registers.sp--;
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.iy & 0xff);
+            Log::dump_registers(this->_cpu);
             break;
         case 0xE9: // jp (iy)
             Log::execute(this->_cpu, opCode, "jp (iy)");
