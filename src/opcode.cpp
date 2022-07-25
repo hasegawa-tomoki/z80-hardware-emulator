@@ -266,9 +266,13 @@ void OpCode::execute(uint8_t opCode){
             break;
         case 0x2A: { // ld hl, (nn)
             Log::execute(this->_cpu, opCode, "ld hl, (nn)");
-            this->_cpu->_registers.l = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
-            this->_cpu->_registers.h = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1);
+            uint16_t addr =
+                    Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc) +
+                    (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8);
             this->_cpu->_special_registers.pc += 2;
+            this->_cpu->_registers.l = Mcycle::m2(this->_cpu, addr);
+            this->_cpu->_registers.h = Mcycle::m2(this->_cpu, addr + 1);
+            Log::dump_registers(this->_cpu);
             break;
         }
         case 0x2B: // dec hl
