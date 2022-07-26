@@ -2,5 +2,6 @@
 #define Z80EMU_CONFIG_HPP
 
 #define Z80EMU_ENABLE_LOG
+#define Z80EMU_NO_GPIO
 
 #endif //Z80EMU_CONFIG_HPP

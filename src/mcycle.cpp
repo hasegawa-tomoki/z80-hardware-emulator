@@ -22,9 +22,11 @@ void Mcycle::int_m1t1t2(Cpu* cpu){
     // tw
     cpu->waitClockRising();
     cpu->waitClockFalling();
+    /*
     while (! cpu->readGpio(Cpu::Z80_GPIO_WAIT)){
         cpu->waitClockFalling();
     }
+     */
 }
 
 void Mcycle::m1t1(Cpu* cpu){
@@ -53,9 +55,11 @@ void Mcycle::m1t2(Cpu* cpu){
         return;
     }
     cpu->waitClockFalling();
+    /*
     while (! cpu->readGpio(Cpu::Z80_GPIO_WAIT)){
         cpu->waitClockFalling();
     }
+     */
 }
 
 void Mcycle::m1t3(Cpu* cpu) {
@@ -99,13 +103,14 @@ void Mcycle::m1t4(Cpu* cpu) {
     uint8_t r7 = (cpu->_special_registers.r + 1 & 0b01111111);
     cpu->_special_registers.r = r1 | r7;
     //printf("R: %02x\n", cpu->_special_registers.r);
-
+    /*
     if (cpu->nmiFalling()){
         cpu->NMI_activated = true;
     }
     if (cpu->intFalling() && cpu->iff1 && cpu->pin_i_busrq){
         cpu->INT_activated = true;
     }
+     */
 }
 
 #pragma clang diagnostic push

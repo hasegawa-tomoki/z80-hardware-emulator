@@ -1,4 +1,6 @@
 /.idea
 /cmake-build-*
 /Google_tests/lib
+/build
+log.txt
 

@@ -1,14 +1,14 @@
 #ifndef Z80EMU_BUS_HPP
 #define Z80EMU_BUS_HPP
 
-#include "../libs/mcp23s17/mcp23s17.hpp"
+//#include "../libs/mcp23s17/mcp23s17.hpp"
 
 class Bus {
 public:
-    Mcp23s17 _io;
+    int _io;
 
     explicit Bus();
-    explicit Bus(Mcp23s17 io);
+    explicit Bus(int io);
 
     void tick();
 

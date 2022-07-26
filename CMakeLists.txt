@@ -5,7 +5,6 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(Google_tests)
-add_subdirectory(libs/mcp23s17)
 
 add_executable(z80emu
         src/z80emu.cpp
@@ -20,6 +19,4 @@ add_executable(z80emu
 
 target_link_libraries(
         z80emu
-        pigpiod_if2
-        mcp23s17
 )

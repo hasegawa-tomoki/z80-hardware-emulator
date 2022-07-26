@@ -1,8 +1,8 @@
 #include <cstdio>
 //#include <pigpio.h>
-#include <pigpiod_if2.h>
+//#include <pigpiod_if2.h>
 #include <unistd.h>
-#include "../libs/mcp23s17/mcp23s17.hpp"
+//#include "../libs/mcp23s17/mcp23s17.hpp"
 #include "cpu.hpp"
 #include "mcycle.hpp"
 #include "log.hpp"
@@ -10,18 +10,18 @@
 int main(){
     printf("Hello z80\n");
 
-    int pi = pigpio_start(nullptr, nullptr);
-    if (pi < 0){
-        printf("Failed to pigpio_start()\n");
-        return 1;
-    }
+//    int pi = pigpio_start(nullptr, nullptr);
+//    if (pi < 0){
+//        printf("Failed to pigpio_start()\n");
+//        return 1;
+//    }
 
-    for (int i = 22; i <= 27; i++){
-        set_mode(pi, i, PI_INPUT);
-        set_pull_up_down(pi, i, PI_PUD_OFF);
-    }
+//    for (int i = 22; i <= 27; i++){
+//        set_mode(pi, i, PI_INPUT);
+//        set_pull_up_down(pi, i, PI_PUD_OFF);
+//    }
 
-    Cpu cpu(pi);
+    Cpu cpu(0);
     if (! cpu.init()){
         return 1;
     }
@@ -50,7 +50,19 @@ int main(){
         }
         printf("%02x ", data);
     }
+    do {
+        printf("%d\n", cpu.readGpio(Cpu::Z80_GPIO_RESET));
+    }while(true);
      */
+    /*
+    cpu._registers.a = 127;
+    cpu._registers.b = 129;
+    cpu._registers.FC_Carry = false;
+    Log::dump_registers(&cpu);
+    cpu._opCode.execute(0x88);
+    Log::dump_registers(&cpu);
+    return 0;
+    */
 
     cpu.instructionCycle();
 

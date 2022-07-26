@@ -10,7 +10,8 @@ void Log::write(Cpu* cpu, char* string){
     char buffer[400];
     snprintf(buffer, sizeof(buffer), "%s", string);
 
-    stream << buffer << std::endl;
+    //stream << buffer << std::endl;
+    //printf("%s\n", buffer);
 #endif //Z80EMU_ENABLE_LOG
 }
 

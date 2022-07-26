@@ -1,6 +1,6 @@
 #include <cstdio>
 #include <ctime>
-#include <pigpiod_if2.h>
+//#include <pigpiod_if2.h>
 #include "stdexcept"
 #include "cpu.hpp"
 #include "mcycle.hpp"
@@ -14,11 +14,11 @@ Cpu::Cpu(int pi)
 
 bool Cpu::init()
 {
-    Mcp23s17 io(this->_pi);
-    io.init();
-    this->_io = io;
-    Bus bus(io);
-    this->_bus = bus;
+//    Mcp23s17 io(this->_pi);
+//    io.init();
+//    this->_io = io;
+//    Bus bus(io);
+//    this->_bus = bus;
 
     OpCode opCode(this);
     this->_opCode = opCode;
@@ -37,19 +37,16 @@ bool Cpu::init()
         printf("Error callback_ex() for Z80_GPIO_CLK");
         return false;
     }
-     */
     int idReset = callback_ex(this->_pi, Z80_GPIO_RESET, EITHER_EDGE, Cpu::intReset, this);
     if (idReset < 0){
         printf("Error callback_ex() for Z80_GPIO_RESET");
         return false;
     }
-    /*
     int idWait = callback_ex(this->_pi, Z80_GPIO_WAIT, EITHER_EDGE, Cpu::intWait, this);
     if (idWait < 0){
         printf("Error callback_ex() for Z80_GPIO_WAIT");
         return false;
     }
-     */
     int idNmi = callback_ex(this->_pi, Z80_GPIO_NMI, EITHER_EDGE, Cpu::intNmi, this);
     if (idNmi < 0){
         printf("Error callback_ex() for Z80_GPIO_NMI");
@@ -60,6 +57,7 @@ bool Cpu::init()
         printf("Error callback_ex() for Z80_GPIO_INT");
         return false;
     }
+     */
 
     return true;
 }
@@ -76,7 +74,7 @@ void Cpu::reset()
     this->iff1 = false;
     this->iff2 = false;
     // clears the PC and registers I and R
-    this->_special_registers.pc = 0;
+    this->_special_registers.pc = 0x100;
     this->_special_registers.i = 0;
     this->_special_registers.r = 0;
     // sets the interrupt status to Mode 0
@@ -97,6 +95,7 @@ void Cpu::reset()
 }
 
 void Cpu::updateControlSignals(){
+    return;
     uint8_t data = 0;
     if (this->pin_o_m1){ data |= 0b00000001; }
     if (this->pin_o_rfsh){ data |= 0b00000010; }
@@ -107,7 +106,7 @@ void Cpu::updateControlSignals(){
     if (this->pin_o_iorq){ data |= 0b01000000; }
     if (this->pin_o_busack){ data |= 0b10000000; }
 
-    this->_io.write_gpio8(IO_CONTROL_DATA_BUS, Mcp23s17::MCP23S17_GPIOB, data);
+//    this->_io.write_gpio8(IO_CONTROL_DATA_BUS, Mcp23s17::MCP23S17_GPIOB, data);
 }
 
 #pragma clang diagnostic push
@@ -162,7 +161,6 @@ void Cpu::intWait(int pi, unsigned gpio, unsigned level, uint32_t tick, void *cp
     cpu->pin_i_wait = level;
 }
 #pragma clang diagnostic pop
-*/
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnusedParameter"
@@ -184,7 +182,6 @@ void Cpu::intInt(int pi, unsigned gpio, unsigned level, uint32_t tick, void *cpu
 }
 #pragma clang diagnostic pop
 
-/*
 bool Cpu::clockRising(){
     if (!this->pin_i_clk_prev && this->pin_i_clk){
         this->pin_i_clk_prev = this->pin_i_clk;
@@ -208,13 +205,17 @@ void Cpu::waitClockFalling(){
  */
 
 void Cpu::waitClockRising() const{
+    return;
     while(! this->readGpio(Z80_GPIO_CLK));
 }
 void Cpu::waitClockFalling() const{
+    return;
     while(this->readGpio(Z80_GPIO_CLK));
 }
 
 bool Cpu::readGpio(uint8_t gpio) const {
+    return false;
+    /*
     uint32_t data;
     if (gpio <= 31){
         data = read_bank_1(this->_pi);
@@ -222,8 +223,9 @@ bool Cpu::readGpio(uint8_t gpio) const {
     }
     data = read_bank_2(this->_pi);
     return (data & (1 << (gpio - 32))) > 0;
+     */
 }
-
+/*
 bool Cpu::nmiFalling(){
     if (this->pin_i_nmi_prev && !this->pin_i_nmi){
         this->pin_i_nmi_prev = this->pin_i_nmi;
@@ -238,7 +240,7 @@ bool Cpu::intFalling(){
     }
     return false;
 }
-
+*/
 void Cpu::instructionCycle(){
     #pragma clang diagnostic push
     #pragma ide diagnostic ignored "EndlessLoop"
@@ -322,9 +324,9 @@ void Cpu::instructionCycle(){
         }
 
         instructions++;
-        if (instructions == 1000){
+        if (instructions == 100000000){
             const double time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC * 1000.0;
-            printf("1,000 instructions in %lf msec.\n", time);
+            printf("100,000,000 instructions in %lf msec.\n", time);
             start = clock();
             instructions = 0;
         }
