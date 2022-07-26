@@ -1248,7 +1248,6 @@ void OpCode::executeCb(uint8_t opCode) {
 
 void OpCode::executeDd(uint8_t opCode){
     switch (opCode){
-
         case 0x09: // add ix, rr
         case 0x19:
         case 0x29:
@@ -1360,6 +1359,20 @@ void OpCode::executeDd(uint8_t opCode){
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.ix + d, *reg);
             break;
         }
+        case 0x84: { // add a, ixh
+            Log::execute(this->_cpu, opCode, "add a, ixh");
+            uint8_t value = this->_cpu->_special_registers.ix >> 8;
+            this->setFlagsByAddition(this->_cpu->_registers.a, value, 0);
+            this->_cpu->_registers.a += value;
+            break;
+        }
+        case 0x85: { // add a, ixl
+            Log::execute(this->_cpu, opCode, "add a, ixl");
+            uint8_t value = this->_cpu->_special_registers.ix & 0xff;
+            this->setFlagsByAddition(this->_cpu->_registers.a, value, 0);
+            this->_cpu->_registers.a += value;
+            break;
+        }
         case 0x86: { // add a, (ix + d)
             Log::execute(this->_cpu, opCode, "add a, (ix + d)");
             auto d = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
@@ -1367,6 +1380,22 @@ void OpCode::executeDd(uint8_t opCode){
             uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.ix + d);
             this->setFlagsByAddition(this->_cpu->_registers.a, value, 0);
             this->_cpu->_registers.a += value;
+            break;
+        }
+        case 0x8C: { // adc a, ixh
+            Log::execute(this->_cpu, opCode, "adc a, ixh");
+            uint8_t value = this->_cpu->_special_registers.ix >> 8;
+            uint8_t carry = this->_cpu->_registers.carry_by_val();
+            this->setFlagsByAddition(this->_cpu->_registers.a, value, carry);
+            this->_cpu->_registers.a += value + carry;
+            break;
+        }
+        case 0x8D: { // adc a, ixl
+            Log::execute(this->_cpu, opCode, "adc a, ixl");
+            uint8_t value = this->_cpu->_special_registers.ix & 0xff;
+            uint8_t carry = this->_cpu->_registers.carry_by_val();
+            this->setFlagsByAddition(this->_cpu->_registers.a, value, carry);
+            this->_cpu->_registers.a += value + carry;
             break;
         }
         case 0x8E: { // adc a, (ix + d)
@@ -1379,6 +1408,20 @@ void OpCode::executeDd(uint8_t opCode){
             this->_cpu->_registers.a += value + carry;
             break;
         }
+        case 0x94: { // sub a, ixh
+            Log::execute(this->_cpu, opCode, "sub a, ixh");
+            uint8_t value = this->_cpu->_special_registers.ix >> 8;
+            this->setFlagsBySubtract(this->_cpu->_registers.a, value, 0);
+            this->_cpu->_registers.a -= value;
+            break;
+        }
+        case 0x95: { // sub a, ixl
+            Log::execute(this->_cpu, opCode, "sub a, ixl");
+            uint8_t value = this->_cpu->_special_registers.ix & 0xff;
+            this->setFlagsBySubtract(this->_cpu->_registers.a, value, 0);
+            this->_cpu->_registers.a -= value;
+            break;
+        }
         case 0x96: { // sub (ix + d)
             Log::execute(this->_cpu, opCode, "sub (ix + d)");
             auto d = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
@@ -1386,6 +1429,22 @@ void OpCode::executeDd(uint8_t opCode){
             uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.ix + d);
             this->setFlagsBySubtract(this->_cpu->_registers.a, value, 0);
             this->_cpu->_registers.a -= value;
+            break;
+        }
+        case 0x9C: { // sbc a, ixh
+            Log::execute(this->_cpu, opCode, "sbc a, ixh");
+            uint8_t value = this->_cpu->_special_registers.ix >> 8;
+            uint8_t carry = this->_cpu->_registers.carry_by_val();
+            this->setFlagsBySubtract(this->_cpu->_registers.a, value, carry);
+            this->_cpu->_registers.a -= value + carry;
+            break;
+        }
+        case 0x9D: { // sbc a, ixl
+            Log::execute(this->_cpu, opCode, "sbc a, ixl");
+            uint8_t value = this->_cpu->_special_registers.ix & 0xff;
+            uint8_t carry = this->_cpu->_registers.carry_by_val();
+            this->setFlagsBySubtract(this->_cpu->_registers.a, value, carry);
+            this->_cpu->_registers.a -= value + carry;
             break;
         }
         case 0x9E: { // sbc a, (ix + d)
@@ -1400,6 +1459,16 @@ void OpCode::executeDd(uint8_t opCode){
             this->_cpu->_registers.FN_Subtract = true;
             break;
         }
+        case 0xA4: // and ixh
+            Log::execute(this->_cpu, opCode, "and ixh");
+            this->_cpu->_registers.a &= (this->_cpu->_special_registers.ix >> 8);
+            this->setFlagsByLogical(true);
+            break;
+        case 0xA5: // and ixl
+            Log::execute(this->_cpu, opCode, "and ixl");
+            this->_cpu->_registers.a &= (this->_cpu->_special_registers.ix & 0xff);
+            this->setFlagsByLogical(true);
+            break;
         case 0xA6: { // and (ix + d)
             Log::execute(this->_cpu, opCode, "and (ix + d)");
             auto d = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
@@ -1408,11 +1477,33 @@ void OpCode::executeDd(uint8_t opCode){
             this->setFlagsByLogical(true);
             break;
         }
+        case 0xAC: // xor ixh
+            Log::execute(this->_cpu, opCode, "xor ixh");
+            this->_cpu->_registers.a ^= (this->_cpu->_special_registers.ix >> 8);
+            this->setFlagsByLogical(false);
+            break;
+        case 0xAD: // xor ixl
+            Log::execute(this->_cpu, opCode, "xor ixl");
+            this->_cpu->_registers.a ^= (this->_cpu->_special_registers.ix & 0xff);
+            this->setFlagsByLogical(false);
+            break;
         case 0xAE: { // xor (ix + d)
             Log::execute(this->_cpu, opCode, "xor (ix + d)");
             auto d = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
             this->_cpu->_special_registers.pc++;
             this->_cpu->_registers.a ^= Mcycle::m2(this->_cpu, this->_cpu->_special_registers.ix + d);
+            this->setFlagsByLogical(false);
+            break;
+        }
+        case 0xB4: { // or ixh
+            Log::execute(this->_cpu, opCode, "or ixh");
+            this->_cpu->_registers.a |= (this->_cpu->_special_registers.ix >> 8);
+            this->setFlagsByLogical(false);
+            break;
+        }
+        case 0xB5: { // or ixl
+            Log::execute(this->_cpu, opCode, "or ixl");
+            this->_cpu->_registers.a |= (this->_cpu->_special_registers.ix & 0xff);
             this->setFlagsByLogical(false);
             break;
         }
@@ -1424,6 +1515,14 @@ void OpCode::executeDd(uint8_t opCode){
             this->setFlagsByLogical(false);
             break;
         }
+        case 0xBC: // cp ixh
+            Log::execute(this->_cpu, opCode, "cp ixh");
+            this->setFlagsBySubtract(this->_cpu->_registers.a, this->_cpu->_special_registers.ix >> 8, 0);
+            break;
+        case 0xBD: // cp ixl
+            Log::execute(this->_cpu, opCode, "cp ixl");
+            this->setFlagsBySubtract(this->_cpu->_registers.a, this->_cpu->_special_registers.ix & 0xff, 0);
+            break;
         case 0xBE: { // cp (ix + d)
             Log::execute(this->_cpu, opCode, "cp (ix + d)");
             auto d = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
@@ -1949,7 +2048,6 @@ void OpCode::executeEd(uint8_t opCode){
 
 void OpCode::executeFd(uint8_t opCode){
     switch (opCode){
-
         case 0x09: // add iy, rr
         case 0x19:
         case 0x29:
@@ -2061,6 +2159,20 @@ void OpCode::executeFd(uint8_t opCode){
             Mcycle::m3(this->_cpu, this->_cpu->_special_registers.iy + d, *reg);
             break;
         }
+        case 0x84: { // add a, iyh
+            Log::execute(this->_cpu, opCode, "add a, iyh");
+            uint8_t value = this->_cpu->_special_registers.iy >> 8;
+            this->setFlagsByAddition(this->_cpu->_registers.a, value, 0);
+            this->_cpu->_registers.a += value;
+            break;
+        }
+        case 0x85: { // add a, iyl
+            Log::execute(this->_cpu, opCode, "add a, iyl");
+            uint8_t value = this->_cpu->_special_registers.iy & 0xff;
+            this->setFlagsByAddition(this->_cpu->_registers.a, value, 0);
+            this->_cpu->_registers.a += value;
+            break;
+        }
         case 0x86: { // add a, (iy + d)
             Log::execute(this->_cpu, opCode, "add a, (iy + d)");
             auto d = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
@@ -2068,6 +2180,22 @@ void OpCode::executeFd(uint8_t opCode){
             uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.iy + d);
             this->setFlagsByAddition(this->_cpu->_registers.a, value, 0);
             this->_cpu->_registers.a += value;
+            break;
+        }
+        case 0x8C: { // adc a, iyh
+            Log::execute(this->_cpu, opCode, "adc a, iyh");
+            uint8_t value = this->_cpu->_special_registers.iy >> 8;
+            uint8_t carry = this->_cpu->_registers.carry_by_val();
+            this->setFlagsByAddition(this->_cpu->_registers.a, value, carry);
+            this->_cpu->_registers.a += value + carry;
+            break;
+        }
+        case 0x8D: { // adc a, iyl
+            Log::execute(this->_cpu, opCode, "adc a, iyl");
+            uint8_t value = this->_cpu->_special_registers.iy & 0xff;
+            uint8_t carry = this->_cpu->_registers.carry_by_val();
+            this->setFlagsByAddition(this->_cpu->_registers.a, value, carry);
+            this->_cpu->_registers.a += value + carry;
             break;
         }
         case 0x8E: { // adc a, (iy + d)
@@ -2080,6 +2208,20 @@ void OpCode::executeFd(uint8_t opCode){
             this->_cpu->_registers.a += value + carry;
             break;
         }
+        case 0x94: { // sub a, iyh
+            Log::execute(this->_cpu, opCode, "sub a, iyh");
+            uint8_t value = this->_cpu->_special_registers.iy >> 8;
+            this->setFlagsBySubtract(this->_cpu->_registers.a, value, 0);
+            this->_cpu->_registers.a -= value;
+            break;
+        }
+        case 0x95: { // sub a, iyl
+            Log::execute(this->_cpu, opCode, "sub a, iyl");
+            uint8_t value = this->_cpu->_special_registers.iy & 0xff;
+            this->setFlagsBySubtract(this->_cpu->_registers.a, value, 0);
+            this->_cpu->_registers.a -= value;
+            break;
+        }
         case 0x96: { // sub (iy + d)
             Log::execute(this->_cpu, opCode, "sub (iy + d)");
             auto d = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
@@ -2087,6 +2229,22 @@ void OpCode::executeFd(uint8_t opCode){
             uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.iy + d);
             this->setFlagsBySubtract(this->_cpu->_registers.a, value, 0);
             this->_cpu->_registers.a -= value;
+            break;
+        }
+        case 0x9C: { // sbc a, iyh
+            Log::execute(this->_cpu, opCode, "sbc a, iyh");
+            uint8_t value = this->_cpu->_special_registers.iy >> 8;
+            uint8_t carry = this->_cpu->_registers.carry_by_val();
+            this->setFlagsBySubtract(this->_cpu->_registers.a, value, carry);
+            this->_cpu->_registers.a -= value + carry;
+            break;
+        }
+        case 0x9D: { // sbc a, iyl
+            Log::execute(this->_cpu, opCode, "sbc a, iyl");
+            uint8_t value = this->_cpu->_special_registers.iy & 0xff;
+            uint8_t carry = this->_cpu->_registers.carry_by_val();
+            this->setFlagsBySubtract(this->_cpu->_registers.a, value, carry);
+            this->_cpu->_registers.a -= value + carry;
             break;
         }
         case 0x9E: { // sbc a, (iy + d)
@@ -2101,6 +2259,16 @@ void OpCode::executeFd(uint8_t opCode){
             this->_cpu->_registers.FN_Subtract = true;
             break;
         }
+        case 0xA4: // and iyh
+            Log::execute(this->_cpu, opCode, "and iyh");
+            this->_cpu->_registers.a &= (this->_cpu->_special_registers.iy >> 8);
+            this->setFlagsByLogical(true);
+            break;
+        case 0xA5: // and iyl
+            Log::execute(this->_cpu, opCode, "and iyl");
+            this->_cpu->_registers.a &= (this->_cpu->_special_registers.iy & 0xff);
+            this->setFlagsByLogical(true);
+            break;
         case 0xA6: { // and (iy + d)
             Log::execute(this->_cpu, opCode, "and (iy + d)");
             auto d = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
@@ -2109,11 +2277,33 @@ void OpCode::executeFd(uint8_t opCode){
             this->setFlagsByLogical(true);
             break;
         }
+        case 0xAC: // xor iyh
+            Log::execute(this->_cpu, opCode, "xor iyh");
+            this->_cpu->_registers.a ^= (this->_cpu->_special_registers.iy >> 8);
+            this->setFlagsByLogical(false);
+            break;
+        case 0xAD: // xor iyl
+            Log::execute(this->_cpu, opCode, "xor iyl");
+            this->_cpu->_registers.a ^= (this->_cpu->_special_registers.iy & 0xff);
+            this->setFlagsByLogical(false);
+            break;
         case 0xAE: { // xor (iy + d)
             Log::execute(this->_cpu, opCode, "xor (iy + d)");
             auto d = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
             this->_cpu->_special_registers.pc++;
             this->_cpu->_registers.a ^= Mcycle::m2(this->_cpu, this->_cpu->_special_registers.iy + d);
+            this->setFlagsByLogical(false);
+            break;
+        }
+        case 0xB4: { // or iyh
+            Log::execute(this->_cpu, opCode, "or iyh");
+            this->_cpu->_registers.a |= (this->_cpu->_special_registers.iy >> 8);
+            this->setFlagsByLogical(false);
+            break;
+        }
+        case 0xB5: { // or iyl
+            Log::execute(this->_cpu, opCode, "or iyl");
+            this->_cpu->_registers.a |= (this->_cpu->_special_registers.iy & 0xff);
             this->setFlagsByLogical(false);
             break;
         }
@@ -2125,6 +2315,14 @@ void OpCode::executeFd(uint8_t opCode){
             this->setFlagsByLogical(false);
             break;
         }
+        case 0xBC: // cp iyh
+            Log::execute(this->_cpu, opCode, "cp iyh");
+            this->setFlagsBySubtract(this->_cpu->_registers.a, this->_cpu->_special_registers.iy >> 8, 0);
+            break;
+        case 0xBD: // cp iyl
+            Log::execute(this->_cpu, opCode, "cp iyl");
+            this->setFlagsBySubtract(this->_cpu->_registers.a, this->_cpu->_special_registers.iy & 0xff, 0);
+            break;
         case 0xBE: { // cp (iy + d)
             Log::execute(this->_cpu, opCode, "cp (iy + d)");
             auto d = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
