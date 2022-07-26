@@ -1586,6 +1586,7 @@ void OpCode::executeEd(uint8_t opCode){
             }
             uint16_t carry = this->_cpu->_registers.carry_by_val();
             this->setFlagsBySbc16(this->_cpu->_registers.hl(), value + carry);
+            this->_cpu->_registers.hl(this->_cpu->_registers.hl() - (value + carry));
             break;
         }
         case 0x43: { // ld (nn), bc
