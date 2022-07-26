@@ -1024,7 +1024,7 @@ void OpCode::execute(uint8_t opCode){
 
 void OpCode::executeCb(uint8_t opCode) {
     if ((opCode >> 6) == 0b01){
-        uint8_t bit = ((opCode & 0b0011100) >> 3);
+        uint8_t bit = ((opCode & 0b00111000) >> 3);
         uint8_t reg_idx = (opCode & 0b00000111);
         if (reg_idx == 0b110){
             // bit b, (hl)
@@ -1037,8 +1037,10 @@ void OpCode::executeCb(uint8_t opCode) {
             uint8_t* reg = this->targetRegister(opCode, 0);
             this->_cpu->_registers.FZ_Zero = ((*reg & (1 << bit)) == 0);
         }
-        this->_cpu->_registers.FN_Subtract = false;
+        this->_cpu->_registers.FPV_ParityOverflow = this->_cpu->_registers.FZ_Zero;
+        this->_cpu->_registers.FS_Sign = (!this->_cpu->_registers.FZ_Zero && 7 == bit);
         this->_cpu->_registers.FH_HalfCarry = true;
+        this->_cpu->_registers.FN_Subtract = false;
         return;
     }
     if ((opCode >> 6) == 0b10){
@@ -1452,11 +1454,9 @@ void OpCode::executeDd(uint8_t opCode){
             auto d = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
             this->_cpu->_special_registers.pc++;
             uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.ix + d);
-            this->_cpu->_registers.FH_HalfCarry = ((this->_cpu->_registers.a & 0xf) - (value & 0xf) - this->_cpu->_registers.carry_by_val() < 0);
-            this->_cpu->_registers.FC_Carry = (this->_cpu->_registers.a - (value + this->_cpu->_registers.carry_by_val()));
-            this->_cpu->_registers.a -= (value + this->_cpu->_registers.carry_by_val());
-            this->_cpu->_registers.FZ_Zero = (this->_cpu->_registers.a == 0);
-            this->_cpu->_registers.FN_Subtract = true;
+            uint8_t carry = this->_cpu->_registers.carry_by_val();
+            this->setFlagsBySubtract(this->_cpu->_registers.a, value, carry);
+            this->_cpu->_registers.a -= value + carry;
             break;
         }
         case 0xA4: // and ixh
@@ -1585,8 +1585,12 @@ void OpCode::executeXxCb(uint16_t idx){
     uint8_t value = Mcycle::m2(this->_cpu, idx + d);
     if ((ex & 0b11000111) == 0b01000110){
         // bit b, (ix + d) // bit b, (iy + d)
-        uint8_t bit = ((ex & 0b0011100) >> 3);
+        uint8_t bit = ((ex & 0b00111000) >> 3);
         this->_cpu->_registers.FZ_Zero = ((value & (1 << bit)) == 0);
+        this->_cpu->_registers.FPV_ParityOverflow = this->_cpu->_registers.FZ_Zero;
+        this->_cpu->_registers.FS_Sign = (!this->_cpu->_registers.FZ_Zero && 7 == bit);
+        this->_cpu->_registers.FH_HalfCarry = true;
+        this->_cpu->_registers.FN_Subtract = false;
     } else if ((ex & 0b11000111) == 0b10000110){
         // res b, (ix + d) // res b, (iy + d)
         uint8_t bit = ((ex & 0b0011100) >> 3);
@@ -2252,11 +2256,9 @@ void OpCode::executeFd(uint8_t opCode){
             auto d = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
             this->_cpu->_special_registers.pc++;
             uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.iy + d);
-            this->_cpu->_registers.FH_HalfCarry = ((this->_cpu->_registers.a & 0xf) - (value & 0xf) - this->_cpu->_registers.carry_by_val() < 0);
-            this->_cpu->_registers.FC_Carry = (this->_cpu->_registers.a - (value + this->_cpu->_registers.carry_by_val()));
-            this->_cpu->_registers.a -= (value + this->_cpu->_registers.carry_by_val());
-            this->_cpu->_registers.FZ_Zero = (this->_cpu->_registers.a == 0);
-            this->_cpu->_registers.FN_Subtract = true;
+            uint8_t carry = this->_cpu->_registers.carry_by_val();
+            this->setFlagsBySubtract(this->_cpu->_registers.a, value, carry);
+            this->_cpu->_registers.a -= value + carry;
             break;
         }
         case 0xA4: // and iyh
