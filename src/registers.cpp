@@ -36,9 +36,9 @@ void Registers::f(uint8_t value){
     this->FC_Carry =            ((value & 0b00000001) > 0);
     this->FN_Subtract =         ((value & 0b00000010) > 0);
     this->FPV_ParityOverflow =  ((value & 0b00000100) > 0);
-    this->F_bit3 =              ((value & 0b00001000) > 0);
+    this->F_X =                 ((value & 0b00001000) > 0);
     this->FH_HalfCarry =        ((value & 0b00010000) > 0);
-    this->F_bit5 =              ((value & 0b00100000) > 0);
+    this->F_Y =                 ((value & 0b00100000) > 0);
     this->FZ_Zero =             ((value & 0b01000000) > 0);
     this->FS_Sign =             ((value & 0b10000000) > 0);
 }
@@ -47,9 +47,9 @@ uint8_t Registers::f() const {
     if (this->FC_Carry){            value |= 0b00000001; }
     if (this->FN_Subtract){         value |= 0b00000010; }
     if (this->FPV_ParityOverflow){  value |= 0b00000100; }
-    if (this->F_bit3){              value |= 0b00001000; }
+    if (this->F_X){                 value |= 0b00001000; }
     if (this->FH_HalfCarry){        value |= 0b00010000; }
-    if (this->F_bit5){              value |= 0b00100000; }
+    if (this->F_Y){                 value |= 0b00100000; }
     if (this->FZ_Zero){             value |= 0b01000000; }
     if (this->FS_Sign){             value |= 0b10000000; }
     return value;

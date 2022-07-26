@@ -2246,6 +2246,11 @@ uint8_t OpCode::count1(uint8_t data){
     return count;
 }
 
+void OpCode::setFlagsXY(uint8_t value) const{
+    this->_cpu->_registers.F_X = ((value & 0b00001000) > 0);
+    this->_cpu->_registers.F_Y = ((value & 0b00100000) > 0);
+}
+
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "ConstantParameter"
 void OpCode::setFlagsByAddition(uint8_t before, uint8_t addition, bool set_carry) const {
@@ -2257,6 +2262,7 @@ void OpCode::setFlagsByAddition(uint8_t before, uint8_t addition, bool set_carry
     this->_cpu->_registers.FS_Sign = ((final_result & 0x80) > 0);
     this->_cpu->_registers.FH_HalfCarry = ((carry & 0x10) != 0);
     this->_cpu->_registers.FPV_ParityOverflow = ((((carry << 1) ^ carry) & 0x100) != 0);
+    this->setFlagsXY(final_result);
     if (set_carry){
         this->_cpu->_registers.FC_Carry = ((carry & 0x100) != 0);
     }
@@ -2272,6 +2278,7 @@ void OpCode::setFlagsBySubtract(uint8_t before, uint8_t subtract, bool set_carry
     this->_cpu->_registers.FS_Sign = ((final_result & 0x80) > 0);
     this->_cpu->_registers.FH_HalfCarry = ((carry & 0x10) != 0);
     this->_cpu->_registers.FPV_ParityOverflow = ((((carry << 1) ^ carry) & 0x100) != 0);
+    this->setFlagsXY(final_result);
     if (set_carry){
         this->_cpu->_registers.FC_Carry = ((carry & 0x100) != 0);
     }
@@ -2284,6 +2291,7 @@ void OpCode::setFlagsByIncrement(uint8_t before) const{
     this->_cpu->_registers.FS_Sign = ((final_result & 0x80) > 0);
     this->_cpu->_registers.FH_HalfCarry = ((final_result & 0x0f) == 0);
     this->_cpu->_registers.FPV_ParityOverflow = (final_result == 0x80);
+    this->setFlagsXY(final_result);
 }
 
 void OpCode::setFlagsByDecrement(uint8_t before) const{
@@ -2293,6 +2301,7 @@ void OpCode::setFlagsByDecrement(uint8_t before) const{
     this->_cpu->_registers.FS_Sign = ((final_result & 0x80) > 0);
     this->_cpu->_registers.FH_HalfCarry = ((final_result & 0x0f) == 0x0f);
     this->_cpu->_registers.FPV_ParityOverflow = (final_result == 0x7f);
+    this->setFlagsXY(final_result);
 }
 
 void OpCode::setFlagsBySbc16(uint16_t before, uint16_t subtract) const{
@@ -2305,6 +2314,7 @@ void OpCode::setFlagsBySbc16(uint16_t before, uint16_t subtract) const{
     this->_cpu->_registers.FS_Sign = ((final_result & 0x8000) > 0);
     this->_cpu->_registers.FZ_Zero = (final_result == 0);
     this->_cpu->_registers.FPV_ParityOverflow = ((((carry << 1) ^ carry) & 0x10000) != 0);
+    this->setFlagsXY((final_result & 0xff00) >> 8);
 }
 
 void OpCode::setFlagsByLogical(bool h){
@@ -2314,6 +2324,7 @@ void OpCode::setFlagsByLogical(bool h){
     this->_cpu->_registers.FPV_ParityOverflow = (this->count1(this->_cpu->_registers.a) % 2 == 0);
     this->_cpu->_registers.FN_Subtract = false;
     this->_cpu->_registers.FC_Carry = false;
+    this->setFlagsXY(this->_cpu->_registers.a);
 }
 
 void OpCode::setFlagsByAdd16(uint16_t before, uint16_t addition) const{
@@ -2322,6 +2333,7 @@ void OpCode::setFlagsByAdd16(uint16_t before, uint16_t addition) const{
     this->_cpu->_registers.FN_Subtract = false;
     this->_cpu->_registers.FC_Carry = ((carry & 0x10000) != 0);
     this->_cpu->_registers.FH_HalfCarry = ((carry & 0x1000) != 0);
+    this->setFlagsXY((result & 0xff00) >> 8);
 }
 
 void OpCode::setFlagsByAdc16(uint16_t before, uint16_t addition) const{
@@ -2334,6 +2346,7 @@ void OpCode::setFlagsByAdc16(uint16_t before, uint16_t addition) const{
     this->_cpu->_registers.FS_Sign = ((final_result & 0x8000) > 0);
     this->_cpu->_registers.FZ_Zero = (0 == final_result);
     this->_cpu->_registers.FPV_ParityOverflow = ((((carry << 1) ^ carry) & 0x10000) != 0);
+    this->setFlagsXY((final_result & 0xff00) >> 8);
 }
 
 void OpCode::setFlagsByRotate(uint8_t n, bool carry) const {
@@ -2343,4 +2356,5 @@ void OpCode::setFlagsByRotate(uint8_t n, bool carry) const {
     this->_cpu->_registers.FS_Sign = ((n & 0x80) > 0);
     this->_cpu->_registers.FZ_Zero = (0 == n);
     this->_cpu->_registers.FPV_ParityOverflow = (this->count1(n) % 2 == 0);
+    this->setFlagsXY(n);
 }
