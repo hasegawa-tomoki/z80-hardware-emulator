@@ -1054,54 +1054,64 @@ void OpCode::executeCb(uint8_t opCode) {
     if (type == 0b01){
         uint8_t bit = ((opCode & 0b00111000) >> 3);
         uint8_t reg_idx = (opCode & 0b00000111);
+        uint8_t value;
         if (reg_idx == 0b110){
             // bit b, (hl)
             Log::execute(this->_cpu, opCode, "bit b, (hl)");
-            uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
-            this->_cpu->_registers.FZ_Zero = ((value & (1 << bit)) == 0);
+            value = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
         } else {
             // bit b, r
             Log::execute(this->_cpu, opCode, "bit b, r");
-            uint8_t* reg = this->targetRegister(opCode, 0);
-            this->_cpu->_registers.FZ_Zero = ((*reg & (1 << bit)) == 0);
+            value = *(this->targetRegister(opCode, 0));
         }
-        this->_cpu->_registers.FPV_ParityOverflow = this->_cpu->_registers.FZ_Zero;
-        this->_cpu->_registers.FS_Sign = (!this->_cpu->_registers.FZ_Zero && 7 == bit);
-        this->_cpu->_registers.FH_HalfCarry = true;
+        this->_cpu->_registers.F_X = getBit(3, value);
+        this->_cpu->_registers.F_Y = getBit(5, value);
+        value &= (1 << bit);
+        this->_cpu->_registers.FS_Sign = (value >> 7);
+        this->_cpu->_registers.FZ_Zero = (value == 0);
         this->_cpu->_registers.FN_Subtract = false;
+        this->_cpu->_registers.FH_HalfCarry = true;
+        this->_cpu->_registers.FPV_ParityOverflow = this->_cpu->_registers.FZ_Zero;
+        if (reg_idx == 0b110){
+            Mcycle::m3(this->_cpu, this->_cpu->_registers.hl(), value);
+            this->_cpu->_registers.F_Y = getBit(5, this->_cpu->_special_registers.pc >> 8);
+            this->_cpu->_registers.F_X = getBit(3, this->_cpu->_special_registers.pc >> 8);
+        } else {
+            *(this->targetRegister(opCode, 0)) = value;
+        }
         return;
     }
     if (type == 0b10){
-        uint8_t bit = ((opCode & 0b0011100) >> 3);
+        uint8_t bit = ((opCode & 0b00111000) >> 3);
         uint8_t reg_idx = (opCode & 0b00000111);
         if (reg_idx == 0b110){
             // res b, (hl)
             Log::execute(this->_cpu, opCode, "res b, (hl)");
             uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
-            value &= -(value & (1 << bit));
+            value &= ~(1 << bit);
             Mcycle::m3(this->_cpu, this->_cpu->_registers.hl(), value);
         } else {
             // res b, r
             Log::execute(this->_cpu, opCode, "res b, r");
             uint8_t* reg = this->targetRegister(opCode, 0);
-            *reg &= -(*reg & (1 << bit));
+            *reg &= ~(1 << bit);
         }
         return;
     }
     if (type == 0b11){
-        uint8_t bit = ((opCode & 0b0011100) >> 3);
+        uint8_t bit = ((opCode & 0b00111000) >> 3);
         uint8_t reg_idx = (opCode & 0b00000111);
         if (reg_idx == 0b110){
             // set b, (hl)
             Log::execute(this->_cpu, opCode, "set b, (hl)");
             uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
-            value |= (value & (1 << bit));
+            value |= (1 << bit);
             Mcycle::m3(this->_cpu, this->_cpu->_registers.hl(), value);
         } else {
             // set b, r
             Log::execute(this->_cpu, opCode, "set b, r");
             uint8_t* reg = this->targetRegister(opCode, 0);
-            *reg |= (*reg & (1 << bit));
+            *reg |= (1 << bit);
         }
         return;
     }
