@@ -1235,6 +1235,33 @@ void OpCode::executeCb(uint8_t opCode) {
 }
 
 void OpCode::executeDd(uint8_t opCode){
+    if ((opCode >> 6) == 0b01 && ((opCode & 0b00111000) >> 3) != 0b110 && (opCode & 0b00000111) != 0b110){
+        uint8_t reg_src = (opCode & 0b00000111);
+        uint8_t value;
+        switch (reg_src){
+            case 0b100:
+                value = this->_cpu->_special_registers.ixh();
+                break;
+            case 0b101:
+                value = this->_cpu->_special_registers.ixl();
+                break;
+            default:
+                value = *(this->targetRegister(reg_src, 0));
+        }
+
+        uint8_t reg_dst = ((opCode & 0b00111000) >> 3);
+        switch (reg_dst){
+            case 0b100:
+                this->_cpu->_special_registers.ixh(value);
+                break;
+            case 0b101:
+                this->_cpu->_special_registers.ixl(value);
+                break;
+            default:
+                *(this->targetRegister(reg_dst, 0)) = value;
+        }
+        return;
+    }
     switch (opCode){
         case 0x09: // add ix, rr
         case 0x19:
@@ -2075,6 +2102,33 @@ void OpCode::executeEd(uint8_t opCode){
 }
 
 void OpCode::executeFd(uint8_t opCode){
+    if ((opCode >> 6) == 0b01 && ((opCode & 0b00111000) >> 3) != 0b110 && (opCode & 0b00000111) != 0b110){
+        uint8_t reg_src = (opCode & 0b00000111);
+        uint8_t value;
+        switch (reg_src){
+            case 0b100:
+                value = this->_cpu->_special_registers.iyh();
+                break;
+            case 0b101:
+                value = this->_cpu->_special_registers.iyl();
+                break;
+            default:
+                value = *(this->targetRegister(reg_src, 0));
+        }
+
+        uint8_t reg_dst = ((opCode & 0b00111000) >> 3);
+        switch (reg_dst){
+            case 0b100:
+                this->_cpu->_special_registers.iyh(value);
+                break;
+            case 0b101:
+                this->_cpu->_special_registers.iyl(value);
+                break;
+            default:
+                *(this->targetRegister(reg_dst, 0)) = value;
+        }
+        return;
+    }
     switch (opCode){
         case 0x09: // add iy, rr
         case 0x19:
