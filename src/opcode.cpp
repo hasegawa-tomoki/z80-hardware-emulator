@@ -84,9 +84,11 @@ void OpCode::execute(uint8_t opCode){
         }
         case 0x07: { // rlca
             Log::execute(this->_cpu, opCode, "rlca");
-            bool carry_bit = ((this->_cpu->_registers.a & 0x80) > 0);
-            this->_cpu->_registers.a = (this->_cpu->_registers.a << 1) | (this->_cpu->_registers.a >> 7);
-            this->setFlagsByRotate(this->_cpu->_registers.a, carry_bit);
+            bool carry_bit = (this->_cpu->_registers.a >> 7);
+            this->_cpu->_registers.a = (this->_cpu->_registers.a << 1) | carry_bit;
+            this->_cpu->_registers.FC_Carry = carry_bit;
+            this->_cpu->_registers.FH_HalfCarry = false;
+            this->_cpu->_registers.FN_Subtract = false;
             break;
         }
         case 0x08: { // ex af, af'
@@ -157,9 +159,11 @@ void OpCode::execute(uint8_t opCode){
             break;
         case 0x17: { // rla
             Log::execute(this->_cpu, opCode, "rla");
-            bool carry_bit = ((this->_cpu->_registers.a & 0x80) > 0);
-            this->_cpu->_registers.a = (this->_cpu->_registers.a << 1) & 0xff | this->_cpu->_registers.carry_by_val();
-            this->setFlagsByRotate(this->_cpu->_registers.a, carry_bit);
+            bool carry_flg = this->_cpu->_registers.FC_Carry;
+            this->_cpu->_registers.FC_Carry = this->_cpu->_registers.a >> 7;
+            this->_cpu->_registers.a = (this->_cpu->_registers.a << 1) | carry_flg;
+            this->_cpu->_registers.FN_Subtract = false;
+            this->_cpu->_registers.FH_HalfCarry = false;
             break;
         }
         case 0x18: { // jr n
@@ -179,9 +183,11 @@ void OpCode::execute(uint8_t opCode){
             break;
         case 0x1F: { // rra
             Log::execute(this->_cpu, opCode, "rra");
-            bool carry_bit = ((this->_cpu->_registers.a & 1) > 0);
-            this->_cpu->_registers.a = (this->_cpu->_registers.a >> 1) | (this->_cpu->_registers.carry_by_val() << 7);
-            this->setFlagsByRotate(this->_cpu->_registers.a, carry_bit);
+            bool carry_flg = this->_cpu->_registers.FC_Carry;
+            this->_cpu->_registers.FC_Carry = this->_cpu->_registers.a & 1;
+            this->_cpu->_registers.a = (this->_cpu->_registers.a >> 1) | (carry_flg << 7);
+            this->_cpu->_registers.FN_Subtract = false;
+            this->_cpu->_registers.FH_HalfCarry = false;
             break;
         }
         case 0x20: // jr nz, n
@@ -1628,6 +1634,7 @@ void OpCode::executeDd(uint8_t opCode){
     }
 }
 
+// XX CB d ex
 void OpCode::executeXxCb(uint16_t idx){
     auto d = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
     this->_cpu->_special_registers.pc++;
