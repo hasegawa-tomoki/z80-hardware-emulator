@@ -1291,6 +1291,13 @@ void OpCode::executeDd(uint8_t opCode){
             this->_cpu->_special_registers.ix = (value << 8) | (this->_cpu->_special_registers.ix & 0xff);
             break;
         }
+        case 0x26: { // ld ixh, n
+            Log::execute(this->_cpu, opCode, "ld ixh, n");
+            uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
+            this->_cpu->_special_registers.pc++;
+            this->_cpu->_special_registers.ix = (value << 8) | (this->_cpu->_special_registers.ix & 0xff);
+            break;
+        }
         case 0x2A: { // ld ix, (nn)
             Log::execute(this->_cpu, opCode, "ld ix, (nn)");
             uint16_t addr =
@@ -1319,6 +1326,13 @@ void OpCode::executeDd(uint8_t opCode){
             uint8_t value = this->_cpu->_special_registers.ix & 0xff;
             this->setFlagsByDecrement(value);
             value--;
+            this->_cpu->_special_registers.ix = (this->_cpu->_special_registers.ix & 0xff00) | value;
+            break;
+        }
+        case 0x2E: { // ld ixl, n
+            Log::execute(this->_cpu, opCode, "ld ixl, n");
+            uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
+            this->_cpu->_special_registers.pc++;
             this->_cpu->_special_registers.ix = (this->_cpu->_special_registers.ix & 0xff00) | value;
             break;
         }
@@ -2125,6 +2139,13 @@ void OpCode::executeFd(uint8_t opCode){
             this->_cpu->_special_registers.iy = (value << 8) | (this->_cpu->_special_registers.iy & 0xff);
             break;
         }
+        case 0x26: { // ld iyh, n
+            Log::execute(this->_cpu, opCode, "ld iyh, n");
+            uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
+            this->_cpu->_special_registers.pc++;
+            this->_cpu->_special_registers.iy = (value << 8) | (this->_cpu->_special_registers.iy & 0xff);
+            break;
+        }
         case 0x2A: { // ld iy, (nn)
             Log::execute(this->_cpu, opCode, "ld iy, (nn)");
             uint16_t addr =
@@ -2153,6 +2174,13 @@ void OpCode::executeFd(uint8_t opCode){
             uint8_t value = this->_cpu->_special_registers.iy & 0xff;
             this->setFlagsByDecrement(value);
             value--;
+            this->_cpu->_special_registers.iy = (this->_cpu->_special_registers.iy & 0xff00) | value;
+            break;
+        }
+        case 0x2E: { // ld iyl, n
+            Log::execute(this->_cpu, opCode, "ld iyl, n");
+            uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
+            this->_cpu->_special_registers.pc++;
             this->_cpu->_special_registers.iy = (this->_cpu->_special_registers.iy & 0xff00) | value;
             break;
         }
