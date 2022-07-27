@@ -35,8 +35,7 @@ void OpCode::execute(uint8_t opCode){
             break;
         case 0x02: { // ld (bc), a
             Log::execute(this->_cpu, opCode, "ld (bc), a");
-            uint8_t addr = (this->_cpu->_registers.b << 8) + this->_cpu->_registers.c;
-            Mcycle::m3(this->_cpu, addr, this->_cpu->_registers.a);
+            Mcycle::m3(this->_cpu, this->_cpu->_registers.bc(), this->_cpu->_registers.a);
             break;
         }
         case 0x03: // inc bc
