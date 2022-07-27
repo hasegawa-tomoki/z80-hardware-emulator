@@ -10,6 +10,15 @@ public:
     uint16_t pc = 0;
     uint16_t ix = 0;
     uint16_t iy = 0;
+
+    void ixh(uint8_t value);
+    [[nodiscard]] uint8_t ixh() const;
+    void ixl(uint8_t value);
+    [[nodiscard]] uint8_t ixl() const;
+    void iyh(uint8_t value);
+    [[nodiscard]] uint8_t iyh() const;
+    void iyl(uint8_t value);
+    [[nodiscard]] uint8_t iyl() const;
 };
 
 
