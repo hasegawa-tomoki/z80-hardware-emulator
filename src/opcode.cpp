@@ -1640,6 +1640,161 @@ void OpCode::executeXxCb(uint16_t idx){
     this->_cpu->_special_registers.pc++;
     uint8_t ex = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
     this->_cpu->_special_registers.pc++;
+    // value = (ix + d)
+    uint8_t value = Mcycle::m2(this->_cpu, idx + d);
+
+    uint8_t x = ((ex & 0b11000000) >> 6);
+    uint8_t y = ((ex & 0b00111000) >> 3);
+    uint8_t z = (ex & 0b00000111);
+
+    //uint8_t result = 0;
+
+    switch (x) {
+        case 0b00: { // rot[y](iz + d)
+            switch (y) {
+                case 0b000: { // rlc
+                    bool carry = value >> 7;
+                    value = (value << 1) | carry;
+                    this->_cpu->_registers.FS_Sign = (value >> 7);
+                    this->_cpu->_registers.FZ_Zero = (value == 0);
+                    this->_cpu->_registers.FPV_ParityOverflow = parity(value);
+                    this->_cpu->_registers.FN_Subtract = false;
+                    this->_cpu->_registers.FH_HalfCarry = false;
+                    this->_cpu->_registers.FC_Carry = carry;
+                    break;
+                }
+                case 0b001: { // rrc
+                    bool carry = value & 1;
+                    value = (value >> 1) | (carry << 7);
+                    this->_cpu->_registers.FS_Sign = (value >> 7);
+                    this->_cpu->_registers.FZ_Zero = (value == 0);
+                    this->_cpu->_registers.FN_Subtract = false;
+                    this->_cpu->_registers.FH_HalfCarry = false;
+                    this->_cpu->_registers.FC_Carry = carry;
+                    this->_cpu->_registers.FPV_ParityOverflow = parity(value);
+                    break;
+                }
+                case 0b010: { // rl
+                    bool carry = this->_cpu->_registers.FC_Carry;
+                    this->_cpu->_registers.FC_Carry = (value >> 7);
+                    value = (value << 1) | carry;
+                    this->_cpu->_registers.FS_Sign = (value >> 7);
+                    this->_cpu->_registers.FZ_Zero = (value == 0);
+                    this->_cpu->_registers.FN_Subtract = false;
+                    this->_cpu->_registers.FH_HalfCarry = false;
+                    this->_cpu->_registers.FPV_ParityOverflow = parity(value);
+                    break;
+                }
+                case 0b011: { // rr
+                    bool carry = this->_cpu->_registers.FC_Carry;
+                    this->_cpu->_registers.FC_Carry = (value & 1);
+                    value = (value >> 1) | (carry << 7);
+                    this->_cpu->_registers.FS_Sign = (value >> 7);
+                    this->_cpu->_registers.FZ_Zero = (value == 0);
+                    this->_cpu->_registers.FN_Subtract = false;
+                    this->_cpu->_registers.FH_HalfCarry = false;
+                    this->_cpu->_registers.FPV_ParityOverflow = parity(value);
+                    break;
+                }
+                case 0b100: { // sla
+                    this->_cpu->_registers.FC_Carry = (value >> 7);
+                    value <<= 1;
+                    this->_cpu->_registers.FS_Sign = (value >> 7);
+                    this->_cpu->_registers.FZ_Zero = (value == 0);
+                    this->_cpu->_registers.FN_Subtract = false;
+                    this->_cpu->_registers.FH_HalfCarry = false;
+                    this->_cpu->_registers.FPV_ParityOverflow = parity(value);
+                    break;
+                }
+                case 0b101: { // sra
+                    this->_cpu->_registers.FC_Carry = (value & 1);
+                    value = (value >> 1) | (value & 0b10000000);
+                    this->_cpu->_registers.FS_Sign = (value >> 7);
+                    this->_cpu->_registers.FZ_Zero = (value == 0);
+                    this->_cpu->_registers.FN_Subtract = false;
+                    this->_cpu->_registers.FH_HalfCarry = false;
+                    this->_cpu->_registers.FPV_ParityOverflow = parity(value);
+                    break;
+                }
+                case 0b110: { // sll
+                    this->_cpu->_registers.FC_Carry = (value >> 7);
+                    value <<= 1;
+                    value |= 1;
+                    this->_cpu->_registers.FS_Sign = (value >> 7);
+                    this->_cpu->_registers.FZ_Zero = (value == 0);
+                    this->_cpu->_registers.FN_Subtract = false;
+                    this->_cpu->_registers.FH_HalfCarry = false;
+                    this->_cpu->_registers.FPV_ParityOverflow = parity(value);
+                    break;
+                }
+                case 0b111: { // srl
+                    this->_cpu->_registers.FC_Carry = (value & 1);
+                    value >>= 1;
+                    this->_cpu->_registers.FS_Sign = (value >> 7);
+                    this->_cpu->_registers.FZ_Zero = (value == 0);
+                    this->_cpu->_registers.FN_Subtract = false;
+                    this->_cpu->_registers.FH_HalfCarry = false;
+                    this->_cpu->_registers.FPV_ParityOverflow = parity(value);
+                    break;
+                }
+                default:
+                    break;
+            }
+            this->_cpu->_registers.F_X = getBit(3, value);
+            this->_cpu->_registers.F_Y = getBit(5, value);
+            break;
+        }
+        case 0b01: { // bit y, (iz+d)
+            value &= (1 << y);
+            this->_cpu->_registers.FS_Sign = (value >> 7);
+            this->_cpu->_registers.FZ_Zero = (value == 0);
+            this->_cpu->_registers.FN_Subtract = false;
+            this->_cpu->_registers.FH_HalfCarry = true;
+            this->_cpu->_registers.FPV_ParityOverflow = this->_cpu->_registers.FZ_Zero;
+            break;
+        }
+        case 0b10: // res y, (iz+d)
+            value &= ~(1 << y);
+            break;
+        case 0b11: // set y, (iz+d)
+            value |= (1 << y);
+            break;
+        default:
+            char error[100];
+            sprintf(error, "Invalid target register code: XX CB %02x %02x", d, ex);
+            Log::error(this->_cpu, error);
+            throw std::runtime_error(error);
+    }
+
+    // ld r[z], rot[y](iz+d)
+    // ld r[z], res y,(iz+d)
+    // ld r[z], set y,(iz+d)
+    if (x != 0b01 && z != 0b110){
+        switch (z) {
+            case 0b000: this->_cpu->_registers.b = value; break;
+            case 0b001: this->_cpu->_registers.c = value; break;
+            case 0b010: this->_cpu->_registers.d = value; break;
+            case 0b011: this->_cpu->_registers.e = value; break;
+            case 0b100: this->_cpu->_registers.h = value; break;
+            case 0b101: this->_cpu->_registers.l = value; break;
+            case 0b110: Mcycle::m3(this->_cpu, this->_cpu->_registers.hl(), value); break;
+            case 0b111: this->_cpu->_registers.a = value; break;
+            default: break;
+        }
+    }
+
+    if (x != 0b01) {
+        Mcycle::m3(this->_cpu, idx + d, value);
+    }
+}
+
+/*
+// XX CB d ex
+void OpCode::_executeXxCb(uint16_t idx){
+    auto d = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
+    this->_cpu->_special_registers.pc++;
+    uint8_t ex = Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
+    this->_cpu->_special_registers.pc++;
     uint8_t value = Mcycle::m2(this->_cpu, idx + d);
     if ((ex & 0b11000111) == 0b01000110){
         // bit b, (ix + d) // bit b, (iy + d)
@@ -1700,6 +1855,7 @@ void OpCode::executeXxCb(uint16_t idx){
         Mcycle::m3(this->_cpu, idx + d, value);
     }
 }
+*/
 
 void OpCode::executeEd(uint8_t opCode){
     switch (opCode){
@@ -2571,6 +2727,14 @@ uint8_t OpCode::count1(uint8_t data){
     return count;
 }
 
+bool OpCode::parity(uint8_t data){
+    uint8_t nb_one_bits = 0;
+    for (int i = 0; i < 8; i++) {
+        nb_one_bits += ((data >> i) & 1);
+    }
+    return (nb_one_bits & 1) == 0;
+}
+
 void OpCode::setFlagsXY(uint8_t value) const{
     this->_cpu->_registers.F_X = ((value & 0b00001000) > 0);
     this->_cpu->_registers.F_Y = ((value & 0b00100000) > 0);
@@ -2682,4 +2846,8 @@ void OpCode::setFlagsByRotate(uint8_t n, bool carry) const {
     this->_cpu->_registers.FZ_Zero = (0 == n);
     this->_cpu->_registers.FPV_ParityOverflow = (this->count1(n) % 2 == 0);
     this->setFlagsXY(n);
+}
+
+bool OpCode::getBit(uint8_t bit, uint8_t value){
+    return ((1 << bit) & value) > 0;
 }

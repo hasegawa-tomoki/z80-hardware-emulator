@@ -153,6 +153,7 @@ private:
     [[nodiscard]] uint8_t* targetRegister(uint8_t opCode, int lsb) const;
     void executeCall();
     static uint8_t count1(uint8_t data);
+    bool parity(uint8_t data);
     void setFlagsXY(uint8_t value) const;
     void setFlagsByAddition(uint8_t before, uint8_t addition, uint8_t carry_value, bool set_carry = true) const;
     void setFlagsBySubtract(uint8_t before, uint8_t subtract, uint8_t carry_value, bool set_carry = true) const;
@@ -163,6 +164,7 @@ private:
     void setFlagsByAdd16(uint16_t before, uint16_t addition) const;
     void setFlagsByAdc16(uint16_t before, uint16_t addition) const;
     void setFlagsByRotate(unsigned char n, bool carry) const;
+    bool getBit(uint8_t bit, uint8_t value);
 };
 
 #endif //Z80EMU_OPCODE_HPP
