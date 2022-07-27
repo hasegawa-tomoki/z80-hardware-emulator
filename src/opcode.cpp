@@ -1875,7 +1875,7 @@ void OpCode::executeEd(uint8_t opCode){
         case 0xA1: { // cpi
             Log::execute(this->_cpu, opCode, "cpi");
             uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
-            this->setFlagsBySubtract(this->_cpu->_registers.a, value, false);
+            this->setFlagsBySubtract(this->_cpu->_registers.a, value, 0, false);
             this->_cpu->_registers.hl(this->_cpu->_registers.hl() + 1);
             this->_cpu->_registers.bc(this->_cpu->_registers.bc() - 1);
             this->_cpu->_registers.FPV_ParityOverflow = (this->_cpu->_registers.bc() != 0);
@@ -1916,7 +1916,7 @@ void OpCode::executeEd(uint8_t opCode){
         case 0xA9: { // cpd
             Log::execute(this->_cpu, opCode, "cpd");
             uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
-            this->setFlagsBySubtract(this->_cpu->_registers.a, value, false);
+            this->setFlagsBySubtract(this->_cpu->_registers.a, value, 0, false);
             this->_cpu->_registers.hl(this->_cpu->_registers.hl() - 1);
             this->_cpu->_registers.bc(this->_cpu->_registers.bc() - 1);
             this->_cpu->_registers.FPV_ParityOverflow = (this->_cpu->_registers.bc() != 0);
@@ -1961,7 +1961,7 @@ void OpCode::executeEd(uint8_t opCode){
             Log::execute(this->_cpu, opCode, "cpir");
             do {
                 uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
-                this->setFlagsBySubtract(this->_cpu->_registers.a, value, false);
+                this->setFlagsBySubtract(this->_cpu->_registers.a, value, 0, false);
                 this->_cpu->_registers.hl(this->_cpu->_registers.hl() + 1);
                 this->_cpu->_registers.bc(this->_cpu->_registers.bc() - 1);
                 this->_cpu->_registers.FPV_ParityOverflow = (this->_cpu->_registers.bc() != 0);
@@ -2010,7 +2010,7 @@ void OpCode::executeEd(uint8_t opCode){
             Log::execute(this->_cpu, opCode, "cpdr");
             do {
                 uint8_t value = Mcycle::m2(this->_cpu, this->_cpu->_registers.hl());
-                this->setFlagsBySubtract(this->_cpu->_registers.a, value, false);
+                this->setFlagsBySubtract(this->_cpu->_registers.a, value, 0, false);
                 this->_cpu->_registers.hl(this->_cpu->_registers.hl() - 1);
                 this->_cpu->_registers.bc(this->_cpu->_registers.bc() - 1);
                 this->_cpu->_registers.FPV_ParityOverflow = (this->_cpu->_registers.bc() != 0);
