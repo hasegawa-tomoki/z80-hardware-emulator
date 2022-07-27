@@ -2014,7 +2014,7 @@ void OpCode::executeEd(uint8_t opCode){
                 this->_cpu->_registers.hl(this->_cpu->_registers.hl() - 1);
                 this->_cpu->_registers.bc(this->_cpu->_registers.bc() - 1);
                 this->_cpu->_registers.FPV_ParityOverflow = (this->_cpu->_registers.bc() != 0);
-            } while(this->_cpu->_registers.bc() > 0);
+            } while(this->_cpu->_registers.bc() > 0 && !this->_cpu->_registers.FZ_Zero);
             break;
         }
         case 0xBA: { // indr
