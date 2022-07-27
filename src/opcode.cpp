@@ -218,39 +218,25 @@ void OpCode::execute(uint8_t opCode){
             break;
         case 0x27: { // daa
             Log::execute(this->_cpu, opCode, "daa");
-            uint8_t a = this->_cpu->_registers.a;
-            uint8_t aH = (a & 0b11110000) >> 4;
-            uint8_t aL = a & 0b00001111;
-            uint8_t h = aH < 9 ? 0 : aH == 9 ? 1 : 2;
-            uint8_t l = aL < 10 ? 0 : 1;
-            uint8_t addition = 0x00;
-            switch ((this->_cpu->_registers.FC_Carry ? 0b010 : 0) | (this->_cpu->_registers.FH_HalfCarry ? 0b001 : 0)) {
-                case 0b00:
-                    switch (h) {
-                        case 0: addition = (0 == l) ? 0x00 : 0x06; break;
-                        case 1: addition = (0 == l) ? 0x00 : 0x66; break;
-                        case 2: addition = (0 == l) ? 0x60 : 0x66; break;
-                        default: throw std::logic_error("Something wrong");
-                    }
-                    break;
-                case 0b01:
-                    switch (h) {
-                        case 0: addition = 0x06; break;
-                        case 1: addition = (0 == l) ? 0x06 : 0x66; break;
-                        case 2: addition = 0x66; break;
-                        default: throw std::logic_error("Something wrong");
-                    }
-                    break;
-                case 0b10: addition = (0 == l) ? 0x60 : 0x66; break;
-                case 0b11: addition = 0x66; break;
+            uint8_t cr = 0;
+            if ((this->_cpu->_registers.a & 0x0f) > 0x09 || this->_cpu->_registers.FH_HalfCarry){
+                cr += 0x06;
             }
-            uint8_t addH = (addition & 0b11110000) >> 4;
-            uint8_t addL = addition & 0b00001111;
-            this->_cpu->_registers.a = a + (this->_cpu->_registers.FN_Subtract ? -addition : addition);
-            this->_cpu->_registers.FH_HalfCarry = (9 < aL + addL);
-            this->_cpu->_registers.FC_Carry = (9 < aH + addH);
-            this->_cpu->_registers.FS_Sign = ((this->_cpu->_registers.a & 0x80) > 0);
-            this->_cpu->_registers.FZ_Zero = (this->_cpu->_registers.a == 0);
+            if (this->_cpu->_registers.a > 0x99 || this->_cpu->_registers.FC_Carry){
+                cr += 0x60;
+                this->_cpu->_registers.FC_Carry = true;
+            }
+            if (this->_cpu->_registers.FN_Subtract){
+                this->_cpu->_registers.FH_HalfCarry =
+                        this->_cpu->_registers.FH_HalfCarry &&
+                        (this->_cpu->_registers.a & 0x0f) < 0x06;
+                this->_cpu->_registers.a -= cr;
+            } else {
+                this->_cpu->_registers.FH_HalfCarry = (this->_cpu->_registers.a & 0x0f) > 0x09;
+                this->_cpu->_registers.a += cr;
+            }
+            this->_cpu->_registers.FS_Sign = this->_cpu->_registers.a >> 7;
+            this->_cpu->_registers.FZ_Zero = this->_cpu->_registers.a == 0;
             this->_cpu->_registers.FPV_ParityOverflow = (OpCode::count1(this->_cpu->_registers.a) % 2 == 0);
             break;
         }
