@@ -1275,6 +1275,22 @@ void OpCode::executeDd(uint8_t opCode){
             Log::execute(this->_cpu, opCode, "inc ix");
             this->_cpu->_special_registers.ix++;
             break;
+        case 0x24: { // inc ixh
+            Log::execute(this->_cpu, opCode, "inc ixh");
+            uint8_t value = this->_cpu->_special_registers.ix >> 8;
+            this->setFlagsByIncrement(value);
+            value++;
+            this->_cpu->_special_registers.ix = (value << 8) | (this->_cpu->_special_registers.ix & 0xff);
+            break;
+        }
+        case 0x25: { // dec ixh
+            Log::execute(this->_cpu, opCode, "dec ixh");
+            uint8_t value = this->_cpu->_special_registers.ix >> 8;
+            this->setFlagsByDecrement(value);
+            value--;
+            this->_cpu->_special_registers.ix = (value << 8) | (this->_cpu->_special_registers.ix & 0xff);
+            break;
+        }
         case 0x2A: { // ld ix, (nn)
             Log::execute(this->_cpu, opCode, "ld ix, (nn)");
             uint16_t addr =
@@ -1290,6 +1306,22 @@ void OpCode::executeDd(uint8_t opCode){
             Log::execute(this->_cpu, opCode, "dec ix");
             this->_cpu->_special_registers.ix--;
             break;
+        case 0x2C: { // inc ixl
+            Log::execute(this->_cpu, opCode, "inc ixl");
+            uint8_t value = this->_cpu->_special_registers.ix & 0xff;
+            this->setFlagsByIncrement(value);
+            value++;
+            this->_cpu->_special_registers.ix = (this->_cpu->_special_registers.ix & 0xff00) | value;
+            break;
+        }
+        case 0x2D: { // dec ixl
+            Log::execute(this->_cpu, opCode, "dec ixl");
+            uint8_t value = this->_cpu->_special_registers.ix & 0xff;
+            this->setFlagsByDecrement(value);
+            value--;
+            this->_cpu->_special_registers.ix = (this->_cpu->_special_registers.ix & 0xff00) | value;
+            break;
+        }
         case 0x34: { // inc (ix + d)
             Log::execute(this->_cpu, opCode, "inc (ix + d)");
             auto d = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
@@ -2077,6 +2109,22 @@ void OpCode::executeFd(uint8_t opCode){
             Log::execute(this->_cpu, opCode, "inc iy");
             this->_cpu->_special_registers.iy++;
             break;
+        case 0x24: { // inc iyh
+            Log::execute(this->_cpu, opCode, "inc iyh");
+            uint8_t value = this->_cpu->_special_registers.iy >> 8;
+            this->setFlagsByIncrement(value);
+            value++;
+            this->_cpu->_special_registers.iy = (value << 8) | (this->_cpu->_special_registers.iy & 0xff);
+            break;
+        }
+        case 0x25: { // dec iyh
+            Log::execute(this->_cpu, opCode, "dec iyh");
+            uint8_t value = this->_cpu->_special_registers.iy >> 8;
+            this->setFlagsByDecrement(value);
+            value--;
+            this->_cpu->_special_registers.iy = (value << 8) | (this->_cpu->_special_registers.iy & 0xff);
+            break;
+        }
         case 0x2A: { // ld iy, (nn)
             Log::execute(this->_cpu, opCode, "ld iy, (nn)");
             uint16_t addr =
@@ -2092,6 +2140,22 @@ void OpCode::executeFd(uint8_t opCode){
             Log::execute(this->_cpu, opCode, "dec iy");
             this->_cpu->_special_registers.iy--;
             break;
+        case 0x2C: { // inc iyl
+            Log::execute(this->_cpu, opCode, "inc iyl");
+            uint8_t value = this->_cpu->_special_registers.iy & 0xff;
+            this->setFlagsByIncrement(value);
+            value++;
+            this->_cpu->_special_registers.iy = (this->_cpu->_special_registers.iy & 0xff00) | value;
+            break;
+        }
+        case 0x2D: { // dec iyl
+            Log::execute(this->_cpu, opCode, "dec iyl");
+            uint8_t value = this->_cpu->_special_registers.iy & 0xff;
+            this->setFlagsByDecrement(value);
+            value--;
+            this->_cpu->_special_registers.iy = (this->_cpu->_special_registers.iy & 0xff00) | value;
+            break;
+        }
         case 0x34: { // inc (iy + d)
             Log::execute(this->_cpu, opCode, "inc (iy + d)");
             auto d = (int8_t)Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc);
