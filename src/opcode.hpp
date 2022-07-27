@@ -164,7 +164,16 @@ private:
     void setFlagsByAdd16(uint16_t before, uint16_t addition) const;
     void setFlagsByAdc16(uint16_t before, uint16_t addition) const;
     void setFlagsByRotate(unsigned char n, bool carry) const;
-    bool getBit(uint8_t bit, uint8_t value);
+    static bool getBit(uint8_t bit, uint8_t value);
+
+    uint8_t cb_rlc(uint8_t value);
+    uint8_t cb_rrc(uint8_t value);
+    uint8_t cb_rl(uint8_t value);
+    uint8_t cb_rr(uint8_t value);
+    uint8_t cb_sla(uint8_t value);
+    uint8_t cb_sra(uint8_t value);
+    uint8_t cb_sll(uint8_t value);
+    uint8_t cb_srl(uint8_t value);
 };
 
 #endif //Z80EMU_OPCODE_HPP
