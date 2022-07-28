@@ -2640,13 +2640,17 @@ void OpCode::executeCall(){
             Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc) +
             (Mcycle::m2(this->_cpu, this->_cpu->_special_registers.pc + 1) << 8);
     this->_cpu->_special_registers.pc += 2;
-    if (this->_cpu->emulate_cpm_bdos_call && jump_addr != 0x0005){
+    if (this->_cpu->emulate_cpm_bdos_call && (jump_addr != 0x0000 && jump_addr != 0x0005)){
         this->_cpu->_special_registers.sp--;
         Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc >> 8);
         this->_cpu->_special_registers.sp--;
         Mcycle::m3(this->_cpu, this->_cpu->_special_registers.sp, this->_cpu->_special_registers.pc & 0xff);
         this->_cpu->_special_registers.pc = jump_addr;
     } else {
+        // CP/M Warm boot
+        if (jump_addr == 0x0000){
+            throw std::runtime_error("CP/M Warm boot");
+        }
         // CP/M BDOS system calls
         Log::dump_registers(this->_cpu);
         switch (this->_cpu->_registers.c){
