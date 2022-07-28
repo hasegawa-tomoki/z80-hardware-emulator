@@ -31,25 +31,11 @@ bool Cpu::init()
     SpecialRegisters specialResistors;
     this->_special_registers = specialResistors;
 
-    /*
-    int idClock = callback_ex(this->_pi, Z80_GPIO_CLK, EITHER_EDGE, Cpu::intClock, this);
-    if (idClock < 0){
-        printf("Error callback_ex() for Z80_GPIO_CLK");
-        return false;
-    }
-     */
     int idReset = callback_ex(this->_pi, Z80_GPIO_RESET, EITHER_EDGE, Cpu::intReset, this);
     if (idReset < 0){
         printf("Error callback_ex() for Z80_GPIO_RESET");
         return false;
     }
-    /*
-    int idWait = callback_ex(this->_pi, Z80_GPIO_WAIT, EITHER_EDGE, Cpu::intWait, this);
-    if (idWait < 0){
-        printf("Error callback_ex() for Z80_GPIO_WAIT");
-        return false;
-    }
-     */
     int idNmi = callback_ex(this->_pi, Z80_GPIO_NMI, EITHER_EDGE, Cpu::intNmi, this);
     if (idNmi < 0){
         printf("Error callback_ex() for Z80_GPIO_NMI");
@@ -125,45 +111,6 @@ void Cpu::intReset(int pi, unsigned gpio, unsigned level, uint32_t tick, void *c
 }
 #pragma clang diagnostic pop
 
-/*
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "UnusedParameter"
-void Cpu::intClock(int pi, unsigned gpio, unsigned level, uint32_t tick, void *cpuObj)
-{
-    Cpu* cpu = static_cast<Cpu*>(cpuObj);
-
-    static int c = 0;
-    static clock_t start = clock();
-    c++;
-    if (c == 1000000){
-        const double time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC * 1000.0;
-        printf("1,000,000 clock in %lf msec.\n", time);
-        start = clock();
-        c = 0;
-    }
-
-
-//    static int c = 1;
-//    if (c % 10 == 0){
-//        printf("Interrupt #%d level %d at %u\n", c, level, tick);
-//    }
-//    c++;
-    cpu->tick = tick;
-    cpu->pin_i_clk_prev = cpu->pin_i_clk;
-    cpu->pin_i_clk = level;
-}
-#pragma clang diagnostic pop
-*/
-/*
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "UnusedParameter"
-void Cpu::intWait(int pi, unsigned gpio, unsigned level, uint32_t tick, void *cpuObj){
-    Cpu* cpu = static_cast<Cpu*>(cpuObj);
-    cpu->pin_i_wait = level;
-}
-#pragma clang diagnostic pop
-*/
-
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnusedParameter"
 void Cpu::intNmi(int pi, unsigned gpio, unsigned level, uint32_t tick, void *cpuObj){
@@ -183,29 +130,6 @@ void Cpu::intInt(int pi, unsigned gpio, unsigned level, uint32_t tick, void *cpu
     cpu->pin_i_int = level;
 }
 #pragma clang diagnostic pop
-
-/*
-bool Cpu::clockRising(){
-    if (!this->pin_i_clk_prev && this->pin_i_clk){
-        this->pin_i_clk_prev = this->pin_i_clk;
-        return true;
-    }
-    return false;
-}
-bool Cpu::clockFalling(){
-    if (this->pin_i_clk_prev && !this->pin_i_clk){
-        this->pin_i_clk_prev = this->pin_i_clk;
-        return true;
-    }
-    return false;
-}
-void Cpu::waitClockRising(){
-    while(! this->clockRising());
-}
-void Cpu::waitClockFalling(){
-    while(! this->clockFalling());
-}
- */
 
 void Cpu::waitClockRising() const{
     while(! this->readGpio(Z80_GPIO_CLK));
