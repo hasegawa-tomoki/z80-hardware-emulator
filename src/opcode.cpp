@@ -1063,21 +1063,14 @@ void OpCode::executeCb(uint8_t opCode) {
             Log::execute(this->_cpu, opCode, "bit b, r");
             value = *(this->targetRegister(opCode, 0));
         }
-        this->_cpu->_registers.F_X = getBit(3, value);
-        this->_cpu->_registers.F_Y = getBit(5, value);
+        //this->_cpu->_registers.F_X = getBit(3, value);
+        //this->_cpu->_registers.F_Y = getBit(5, value);
         value &= (1 << bit);
-        this->_cpu->_registers.FS_Sign = (value >> 7);
         this->_cpu->_registers.FZ_Zero = (value == 0);
+        this->_cpu->_registers.FS_Sign = (!this->_cpu->_registers.FZ_Zero && bit == 7);
         this->_cpu->_registers.FN_Subtract = false;
         this->_cpu->_registers.FH_HalfCarry = true;
         this->_cpu->_registers.FPV_ParityOverflow = this->_cpu->_registers.FZ_Zero;
-        if (reg_idx == 0b110){
-            Mcycle::m3(this->_cpu, this->_cpu->_registers.hl(), value);
-            this->_cpu->_registers.F_Y = getBit(5, this->_cpu->_special_registers.pc >> 8);
-            this->_cpu->_registers.F_X = getBit(3, this->_cpu->_special_registers.pc >> 8);
-        } else {
-            *(this->targetRegister(opCode, 0)) = value;
-        }
         return;
     }
     if (type == 0b10){
