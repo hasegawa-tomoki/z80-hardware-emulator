@@ -21,3 +21,4 @@ Work in progress.
 * [suzukiplan/z80](https://github.com/suzukiplan/z80)
 * [gabrielrcouto/php-terminal-gameboy-emulator](https://github.com/gabrielrcouto/php-terminal-gameboy-emulator)
 * [petrockblog/RPi-MCP23S17](https://github.com/petrockblog/RPi-MCP23S17)
+* [KiCad Libraries](https://kicad.github.io)

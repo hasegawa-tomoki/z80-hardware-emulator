@@ -15,7 +15,7 @@ Mcp23s17::Mcp23s17(int pi)
 
 int Mcp23s17::init()
 {
-    set_mode(this->_pi, GPIO_IORESET, PI_OUTPUT);
+    setmode(this->_pi, GPIO_IORESET, PI_OUTPUT);
 
     int spi_cs = 0;
     int spi_baud = 10 * 1000 * 1000;
