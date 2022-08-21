@@ -102,14 +102,6 @@ int main(){
     }
     printf("%d errors\n", err);
 
-    //// Measure execution time
-    clock_t start = clock();
-    for (int i = 0; i < 1000; i++){
-        gpioRead(10);
-    }
-    double time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC * 1000.0;
-    printf("1000 single I/O in %lf msec.\n", time);
-
     // Benchmark
     std::random_device rnd;
     volatile uint32_t data;
@@ -167,9 +159,9 @@ int main(){
     // Ave: 77ns, Min: 77ns, Max: 83ns
 
     // -- 4MHz
-    // 1clk = 0.00000025 sec = 0.00025 msec = 0.25 usec = 250 nsec
-    // M1 = 4clk = 1 usec
+    // 1clk = 0.00000025 sec = 0.00025 ms = 0.25 us = 250 ns
+    // M1 = 4clk = 1us
     // -- 2.5MHz
-    // 1clk = 0.0000004 sec = 0.0004 msec = 0.4 usec = 400 nsec
-    // 1clk 0.4 usec → 2.5MHz
+    // 1clk = 0.0000004 sec = 0.0004 ms = 0.4 us = 400 ns
+    // M1 = 4clk = 1.6us
 }

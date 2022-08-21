@@ -10,7 +10,7 @@ public:
     PigpioBus();
 
     void setAddress(uint16_t addr) override;
-    void setData(uint8_t data) override;
+    void setDataBegin(uint8_t data) override;
     uint8_t getData() override;
     void setControl(uint8_t z80PinName, bool level) override;
     bool getInput(uint8_t z80PinName) override;

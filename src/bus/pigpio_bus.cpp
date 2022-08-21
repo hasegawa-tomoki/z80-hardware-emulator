@@ -119,7 +119,7 @@ void PigpioBus::setAddress(uint16_t addr){
     this->waitNanoSec(5);
 }
 
-void PigpioBus::setData(uint8_t data){
+void PigpioBus::setDataBegin(uint8_t data){
     if (true or this->currentDataBusMode != DATA_BUS_DIR_OUT){
         this->currentDataBusMode = DATA_BUS_DIR_OUT;
         for (int i = RPi_GPIO_D0; i <= RPi_GPIO_D7; i++){

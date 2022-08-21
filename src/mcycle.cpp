@@ -163,7 +163,7 @@ void Mcycle::m3(Cpu* cpu, uint16_t addr, uint8_t data){
     cpu->bus->waitClockRising();
     cpu->bus->setAddress(addr);
     cpu->bus->waitClockFalling();
-    cpu->bus->setData(data);
+    cpu->bus->setDataBegin(data);
     cpu->bus->pin_o_mreq = Bus::PIN_LOW;
     cpu->bus->syncControl();
     // T2
@@ -180,6 +180,7 @@ void Mcycle::m3(Cpu* cpu, uint16_t addr, uint8_t data){
     cpu->bus->pin_o_mreq = Bus::PIN_HIGH;
     cpu->bus->pin_o_wr = Bus::PIN_HIGH;
     cpu->bus->syncControl();
+    cpu->bus->setDataEnd();
 
     Log::mem_write(cpu, addr, data);
 }
@@ -220,7 +221,7 @@ void Mcycle::out(Cpu* cpu, uint8_t portL, uint8_t portH, uint8_t data){
     cpu->bus->waitClockRising();
     uint16_t port = (portH << 8) | portL;
     cpu->bus->setAddress(port);
-    cpu->bus->setData(data);
+    cpu->bus->setDataBegin(data);
     cpu->bus->waitClockFalling();
     // T2
     cpu->bus->waitClockRising();
@@ -240,6 +241,7 @@ void Mcycle::out(Cpu* cpu, uint8_t portL, uint8_t portH, uint8_t data){
     cpu->bus->pin_o_iorq = Bus::PIN_HIGH;
     cpu->bus->pin_o_wr = Bus::PIN_HIGH;
     cpu->bus->syncControl();
+    cpu->bus->setDataEnd();
 
     Log::io_write(cpu, port, data);
 }

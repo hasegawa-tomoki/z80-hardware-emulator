@@ -69,35 +69,37 @@ void PigpioBusBulk::setAddress(uint16_t addr){
     this->address = addr;
 }
 
-void PigpioBusBulk::setData(uint8_t data){
+void PigpioBusBulk::setDataBegin(uint8_t data){
     if (this->currentDataBusMode != DATA_BUS_DIR_OUT){
         this->currentDataBusMode = DATA_BUS_DIR_OUT;
 
-        gpioWrite(RPi_GPIO_DATA_BUS_OE, DATA_BUS_ISOLATED);
         for (int i = RPi_GPIO_D0; i <= RPi_GPIO_D7; i++){
             gpioSetMode(i, PI_OUTPUT);
         }
         gpioWrite(RPi_GPIO_DATA_BUS_DIR, DATA_BUS_DIR_OUT);
-        gpioWrite(RPi_GPIO_DATA_BUS_OE, DATA_BUS_ENABLED);
     }
+    gpioWrite(RPi_GPIO_DATA_BUS_OE, DATA_BUS_ENABLED);
     gpioWrite_Bits_0_31_Set(data << 8);
     gpioWrite_Bits_0_31_Clear(((~data) << 8) & 0x0000ff00);
+}
+
+void PigpioBusBulk::setDataEnd(){
+    gpioWrite(RPi_GPIO_DATA_BUS_OE, DATA_BUS_ISOLATED);
 }
 
 uint8_t PigpioBusBulk::getData(){
     if (this->currentDataBusMode != DATA_BUS_DIR_IN){
         this->currentDataBusMode = DATA_BUS_DIR_IN;
 
-        gpioWrite(RPi_GPIO_DATA_BUS_OE, DATA_BUS_ISOLATED);
         for (int i = RPi_GPIO_D0; i <= RPi_GPIO_D7; i++){
             gpioSetMode(i, PI_INPUT);
         }
         gpioWrite(RPi_GPIO_DATA_BUS_DIR, DATA_BUS_DIR_IN);
-        gpioWrite(RPi_GPIO_DATA_BUS_OE, DATA_BUS_ENABLED);
     }
-    waitNanoSec(5);
+    gpioWrite(RPi_GPIO_DATA_BUS_OE, DATA_BUS_ENABLED);
     uint32_t bits = gpioRead_Bits_0_31();
     uint8_t data = 0x000000ff & (bits >> 8);
+    gpioWrite(RPi_GPIO_DATA_BUS_OE, DATA_BUS_ISOLATED);
 
     return data;
 }
@@ -173,10 +175,4 @@ void PigpioBusBulk::waitClockFalling(){
     }
     while(gpioRead(RPi_GPIO_I_CLK));
      */
-}
-
-void PigpioBusBulk::waitNanoSec(int ns){
-    for (int i = 0; i < 1 * ns; i++){
-        gpioRead_Bits_0_31();
-    }
 }

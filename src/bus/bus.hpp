@@ -6,7 +6,8 @@
 class Bus {
 public:
     virtual void setAddress(uint16_t addr) = 0;
-    virtual void setData(uint8_t data) = 0;
+    virtual void setDataBegin(uint8_t data) = 0;
+    virtual void setDataEnd() = 0;
     virtual uint8_t getData() = 0;
     virtual void setControl(uint8_t z80PinName, bool level) = 0;
     virtual bool getInput(uint8_t z80PinName) = 0;

@@ -1,7 +1,5 @@
 #include <cstdio>
 #include <ctime>
-#include <utility>
-#include <pigpio.h>
 #include "stdexcept"
 #include "cpu.hpp"
 #include "mcycle.hpp"
