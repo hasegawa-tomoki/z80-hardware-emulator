@@ -21,12 +21,6 @@ Cpu::Cpu(Bus *_bus)
     this->special_registers = specialResistors;
 }
 
-/**
- * Reset (input, active Low). RESET initializes the CPU as follows:
- * it resets the interrupt enable flip-flop, clears the PC and registers I and R, and sets the interrupt status to Mode 0.
- * During reset time, the address and data bus go to a high-impedance state, and all control output signals go to the inactive state.
- * Notice that RESET must be active for a minimum of three full clock cycles before the reset operation is complete.
- */
 void Cpu::reset()
 {
     // it resets the interrupt enable flip-flop
@@ -141,8 +135,6 @@ void Cpu::instructionCycle(){
                         uint16_t int_vector_addr =
                                 Mcycle::m2(this, int_vector_pointer) +
                                 (Mcycle::m2(this, int_vector_pointer + 1) << 8);
-                        //printf("Int vector pointer: %04x\n", int_vector_pointer);
-                        //printf("Int vector addr: %04x\n", int_vector_addr);
                         this->special_registers.pc = int_vector_addr;
                         break;
                     }
