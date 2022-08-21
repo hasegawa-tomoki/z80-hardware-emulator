@@ -67,6 +67,7 @@ void Cpu::instructionCycle(){
                 printf("Resetting\n");
                 Log::general(this, "Reset");
                 this->reset();
+                lastReset = clock();
             }
         }
         if (this->halt) {
