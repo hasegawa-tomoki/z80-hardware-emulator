@@ -8,11 +8,6 @@
 class PigpioBus : public Bus {
 public:
     PigpioBus();
-    /*
-    static void intReset(int gpio, int level, uint32_t tick, void *busObj);
-    static void intNmi(int gpio, int level, uint32_t tick, void *busObj);
-    static void intInt(int gpio, int level, uint32_t tick, void *busObj);
-     */
 
     void setAddress(uint16_t addr) override;
     void setData(uint8_t data) override;
@@ -24,8 +19,6 @@ public:
     void waitClockRising() override;
     void waitClockFalling() override;
 
-    uint32_t gpio_bank1 = 0;
-    //uint32_t gpio_bank2 = 0;
     uint8_t currentDataBusMode = 0xff;
 
     static const uint8_t RPi_GPIO_L_A0 = 0;

@@ -80,7 +80,6 @@ void PigpioBusBulk::setData(uint8_t data){
         gpioWrite(RPi_GPIO_DATA_BUS_DIR, DATA_BUS_DIR_OUT);
         gpioWrite(RPi_GPIO_DATA_BUS_OE, DATA_BUS_ENABLED);
     }
-    this->data = data;
     gpioWrite_Bits_0_31_Set(data << 8);
     gpioWrite_Bits_0_31_Clear(((~data) << 8) & 0x0000ff00);
 }
@@ -96,10 +95,10 @@ uint8_t PigpioBusBulk::getData(){
         gpioWrite(RPi_GPIO_DATA_BUS_DIR, DATA_BUS_DIR_IN);
         gpioWrite(RPi_GPIO_DATA_BUS_OE, DATA_BUS_ENABLED);
     }
+    waitNanoSec(5);
     uint32_t bits = gpioRead_Bits_0_31();
     uint8_t data = 0x000000ff & (bits >> 8);
 
-    this->data = data;
     return data;
 }
 

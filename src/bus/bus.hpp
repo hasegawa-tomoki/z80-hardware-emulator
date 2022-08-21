@@ -16,11 +16,7 @@ public:
     virtual void waitClockFalling() = 0;
     static void waitNanoSec(int ns);
 
-    bool nmiFalling();
-    bool intFalling();
-
     uint16_t address = 0;
-    uint8_t data = 0;
 
     uint8_t pin_o_m1 = PIN_HIGH;
     uint8_t pin_o_rfsh = PIN_HIGH;

@@ -128,7 +128,6 @@ void PigpioBus::setData(uint8_t data){
         gpioWrite(RPi_GPIO_DATA_BUS_DIR, DATA_BUS_DIR_OUT);
         waitNanoSec(2);
     }
-    this->data = data;
     for (int i = 0; i <= 7; i++){
         uint8_t bit = ((data & (1 << i)) > 0);
         gpioWrite(RPi_GPIO_D0 +  i, bit);
@@ -150,7 +149,6 @@ uint8_t PigpioBus::getData(){
             data |= (1 << i);
         }
     }
-    this->data = data;
     return data;
 }
 

@@ -20,8 +20,6 @@ public:
     void waitClockFalling() override;
     static void waitNanoSec(int ns);
 
-    uint32_t gpio_bank1 = 0;
-    //uint32_t gpio_bank2 = 0;
     uint8_t currentDataBusMode = 0xff;
 
     static const uint8_t RPi_GPIO_L_A0 = 0;
