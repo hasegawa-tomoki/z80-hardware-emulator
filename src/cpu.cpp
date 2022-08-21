@@ -71,25 +71,31 @@ void Cpu::instructionCycle(){
                 this->reset();
             }
         }
-        Mcycle::m1t1(this);
-        Mcycle::m1t2(this);
-        Mcycle::m1t3(this);
-        Mcycle::m1t4(this);
+        if (this->halt) {
+            Mcycle::m1halt(this);
+        } else if (this->enable_virtual_memory){
+            Mcycle::m1vm(this);
+        } else {
+            Mcycle::m1t1(this);
+            Mcycle::m1t2(this);
+            Mcycle::m1t3(this);
+            Mcycle::m1t4(this);
+        }
         this->opCode.execute(this->executing);
 
         // Disable / Enable interrupt
         if (this->waitingEI > 0){
-            Log::general(this, "Enable interrupt");
             this->waitingEI--;
             if (this->waitingEI == 0){
+                Log::general(this, "INT enabled");
                 this->iff1 = true;
                 this->iff2 = true;
             }
         }
         if (this->waitingDI > 0){
-            Log::general(this, "Disable interrupt");
             this->waitingDI--;
             if (this->waitingDI == 0){
+                Log::general(this, "INT disabled");
                 this->iff1 = false;
                 this->iff2 = false;
             }
@@ -109,38 +115,41 @@ void Cpu::instructionCycle(){
             this->special_registers.pc = nmi_jump_addr;
         }
         // INT
-        if ((!this->bus->getInput(Bus::Z80_PIN_I_INT)) && this->iff1 && this->bus->getInput(Bus::Z80_PIN_I_BUSRQ)){
+        if ((!this->bus->getInput(Bus::Z80_PIN_I_INT)) && this->iff1){
             Log::general(this, "INT-activated");
-            Mcycle::int_m1t1t2(this);
-            Mcycle::m1t3(this);
-            Mcycle::m1t4(this);
+            if (! this->bus->getInput(Bus::Z80_PIN_I_BUSRQ)){
+                Log::general(this, "but BUSRQ is low.");
+            } else {
+                Mcycle::int_m1t1t2(this);
+                Mcycle::m1t3(this);
+                Mcycle::m1t4(this);
 
-            this->special_registers.sp--;
-            Mcycle::m3(this, this->special_registers.sp, this->special_registers.pc >> 8);
-            this->special_registers.sp--;
-            Mcycle::m3(this, this->special_registers.sp, this->special_registers.pc & 0xff);
+                Mcycle::m3(this, this->special_registers.sp - 2, this->special_registers.pc & 0xff);
+                Mcycle::m3(this, this->special_registers.sp - 1, this->special_registers.pc >> 8);
+                this->special_registers.sp -= 2;
 
-            uint8_t int_vector = this->executing;
-            Log::io_read(this, this->special_registers.pc, int_vector);
-            switch (this->interrupt_mode){
-                case 0:
-                    this->opCode.execute(int_vector);
-                    break;
-                case 1:
-                    this->special_registers.pc = 0x0038;
-                    break;
-                case 2: {
-                    uint16_t int_vector_pointer = (this->special_registers.i << 8) + (int_vector & 0b11111110);
-                    uint16_t int_vector_addr =
-                            Mcycle::m2(this, int_vector_pointer) +
-                            (Mcycle::m2(this, int_vector_pointer + 1) << 8);
-                    printf("Int vector pointer: %04x\n", int_vector_pointer);
-                    printf("Int vector addr: %04x\n", int_vector_addr);
-                    this->special_registers.pc = int_vector_addr;
-                    break;
+                uint8_t int_vector = this->executing;
+                Log::io_read(this, this->special_registers.pc, int_vector);
+                switch (this->interrupt_mode) {
+                    case 0:
+                        this->opCode.execute(int_vector);
+                        break;
+                    case 1:
+                        this->special_registers.pc = 0x0038;
+                        break;
+                    case 2: {
+                        uint16_t int_vector_pointer = (this->special_registers.i << 8) + (int_vector & 0b11111110);
+                        uint16_t int_vector_addr =
+                                Mcycle::m2(this, int_vector_pointer) +
+                                (Mcycle::m2(this, int_vector_pointer + 1) << 8);
+                        //printf("Int vector pointer: %04x\n", int_vector_pointer);
+                        //printf("Int vector addr: %04x\n", int_vector_addr);
+                        this->special_registers.pc = int_vector_addr;
+                        break;
+                    }
+                    default:
+                        throw std::runtime_error("Invalid interrupt mode.");
                 }
-                default:
-                    throw std::runtime_error("Invalid interrupt mode.");
             }
         }
 

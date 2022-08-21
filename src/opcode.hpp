@@ -151,6 +151,7 @@ public:
     };
 private:
     [[nodiscard]] uint8_t* targetRegister(uint8_t opCode, int lsb) const;
+    void executeRet();
     void executeCall();
     static uint8_t count1(uint8_t data);
     bool parity(uint8_t data);

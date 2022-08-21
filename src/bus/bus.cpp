@@ -18,7 +18,7 @@ bool Bus::intFalling(){
 }
 
 void Bus::waitNanoSec(int ns){
-    struct timespec req{};
+    static struct timespec req{};
     req.tv_sec = 0;
     req.tv_nsec = ns;
     nanosleep(&req, nullptr);

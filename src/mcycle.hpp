@@ -6,6 +6,8 @@ class Cpu;
 class Mcycle {
 public:
     static void int_m1t1t2(Cpu* cpu);
+    static void m1vm(Cpu* cpu);
+    static void m1halt(Cpu* cpu);
 
     static void m1t1(Cpu* cpu);
     static void m1t2(Cpu* cpu);

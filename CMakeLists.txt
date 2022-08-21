@@ -16,9 +16,12 @@ add_executable(z80emu
         src/log.cpp
         src/config.hpp
         src/bus/bus.cpp
-        src/bus/pigpio_bus.cpp)
+        src/bus/pigpio_bus_bulk.cpp
+        src/bus/pigpio_bus.cpp
+        )
 
 target_link_libraries(
         z80emu
         pigpio
+        wiringPi
 )
