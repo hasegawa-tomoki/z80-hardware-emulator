@@ -6,7 +6,7 @@
 #include "bus/pigpio_bus_bulk.hpp"
 #include <unistd.h>
 
-void Mcycle::int_m1t1t2(Cpu *cpu){
+void Mcycle::int_m1t1t2t3(Cpu *cpu){
     // t1
     cpu->bus->waitClockRising();
     cpu->bus->setAddress(cpu->special_registers.pc);
@@ -29,6 +29,23 @@ void Mcycle::int_m1t1t2(Cpu *cpu){
     while (!cpu->bus->getInput(Bus::Z80_PIN_I_WAIT)){
         cpu->bus->waitClockFalling();
     }
+    // T3-rising: Fetch data. Output refresh address. Update control signals
+    cpu->bus->waitClockRising();
+    cpu->executing = cpu->bus->getData();
+
+    auto refreshAddr = (uint16_t)((cpu->special_registers.i << 8) | cpu->special_registers.r);
+    cpu->bus->setAddress(refreshAddr);
+
+    cpu->bus->pin_o_iorq = Bus::PIN_HIGH;
+    cpu->bus->pin_o_rd = Bus::PIN_HIGH;
+    cpu->bus->pin_o_m1 = Bus::PIN_HIGH;
+    cpu->bus->pin_o_rfsh = Bus::PIN_LOW;
+    cpu->bus->syncControl();
+
+    // T3-falling: Activate MREQ
+    cpu->bus->waitClockFalling();
+    cpu->bus->pin_o_mreq = Bus::PIN_LOW;
+    cpu->bus->syncControl();
 }
 
 void Mcycle::m1vm(Cpu *cpu){

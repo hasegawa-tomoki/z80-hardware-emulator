@@ -5,7 +5,7 @@ class Cpu;
 
 class Mcycle {
 public:
-    static void int_m1t1t2(Cpu* cpu);
+    static void int_m1t1t2t3(Cpu* cpu);
     static void m1vm(Cpu* cpu);
     static void m1halt(Cpu* cpu);
 

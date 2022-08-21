@@ -113,8 +113,7 @@ void Cpu::instructionCycle(){
             if (! this->bus->getInput(Bus::Z80_PIN_I_BUSRQ)){
                 Log::general(this, "but BUSRQ is low.");
             } else {
-                Mcycle::int_m1t1t2(this);
-                Mcycle::m1t3(this);
+                Mcycle::int_m1t1t2t3(this);
                 Mcycle::m1t4(this);
 
                 Mcycle::m3(this, this->special_registers.sp - 2, this->special_registers.pc & 0xff);
@@ -145,9 +144,9 @@ void Cpu::instructionCycle(){
         }
 
         instructions++;
-        if (instructions == 1000){
+        if (instructions == 1000 * 1000){
             const double time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC * 1000.0;
-            printf("1,000 instructions in %lf msec.\n", time);
+            printf("1M instructions in %lf msec.\n", time);
             start = clock();
             instructions = 0;
         }
